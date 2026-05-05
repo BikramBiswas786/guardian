@@ -1,0 +1,3985 @@
+{
+  "uuid": "f8009246-74bd-4fa1-9e7c-c4f93bd54109",
+  "name": "AMS-III.AV v9.0 + VMR0015 v1.0 \u2014 Safe Drinking Water dMRV (v6.9.0 institutional)",
+  "version": "6.9.0",
+  "description": "[DUAL-MODE v6.8 DISCLOSURE] DEFAULT EXECUTION PATH: VMR0015-COMPLIANT (2 distinct VVB approvals required, rep-weighted sum >= 1.5, no duplicate DIDs, byte-equivalent to v6.6 ergate SHA d0b32a9a). OPT-IN PATH: testnetSelfAttestMode -- triggered ONLY when document.selfAttestMode === true AND chainGuard detects testnet network via owner-DID prefix did:hedera:testnet:. Opt-in relaxes 2-VVB rule to 1 VVB with rep>=0.5 floor. Opt-in is per-transaction, not per-policy. Mainnet self-attest submissions are HARD-REJECTED at chainGuard (string-match heuristic on DID network prefix; not cryptographic enforcement -- for true mainnet compliance, deploy v6.6 unchanged). ENFORCED IN BOTH MODES: ER>0, vcuQuantity>0, owner confirmation (ownerConfirmation=true, confirmedAmount==vcuQuantity, <=24h freshness), no partial retire (field3==vcuQuantity), 30-day signature freshness, DID format regex, rejection blocks mint, rep>=0.5 floor even in self-attest. VMR0015 DEVIATION (DEV-001): \u00a74.2 Multi-VVB rule relaxed to single-VVB ONLY when opt-in flag set AND chainGuard cleared (testnet only). Default path remains fully VMR0015-compliant. Mainnet remediation: submit without selfAttestMode flag; default 2-VVB enforcement applies automatically. No code change needed for mainnet. PER-MINT AUDIT LOG: Every gate evaluation writes modeAuditLog VC capturing network, selfAttestRequested, selfAttestGranted, chainGuardVerdict, distinctApprovers, repWeightedSum, signers list, methodologyCompliance verdict (VMR0015_COMPLIANT or OPT_IN_NON_COMPLIANT_TESTNET_ONLY), thresholdApplied. Reviewer can grep on-chain HCS records for compliance status per mint. TESTING: 25/25 simulation scenarios PASS (default+1VVB rejects, default+2VVB passes, mainnet+2VVB passes, opt-in+1VVB+testnet passes, opt-in+1VVB+mainnet hard-rejects, opt-in+2VVB+mainnet hard-rejects, ER<=0 rejected both modes, owner-confirm enforced both modes, partial retire blocked both modes, rep<0.5 rejected, stale sig rejected, VVB rejection blocks mint, audit log content correct, TC1 byte-exact 191.97/10.10). 0 defects. FIXTURE TC1 SHA256: ffdeff31017254ff80064871e3677eafa2bb5795ddb768f6ccc97966c1d7b93c. [HONEST CAVEATS] (1) chainGuard is a string-match heuristic on DID network prefix, not cryptographic chain verification. Catches accidents, not malicious actors. For true mainnet assurance, deploy v6.6 (no opt-in code path) instead. (2) MGS instance is custodial -- user does not hold private keys for wallet 0.0.8836848. Buffer wallet 0.0.6255927 is HashPack-managed (user-held keys), separate from MGS. (3) Single-VVB self-attest path is methodology-non-compliant by design and is intended ONLY for testnet HTS demonstration. Production credit issuance requires accredited 2nd VVB. (4) Schema topic 0.0.8838546 is frozen at version 1.1.0 -- do NOT bump policy version. (5) No real GHG project is registered to this policy; this is methodology + dMRV pipeline reference, not an active credit-issuing deployment. [REVIEWER SUMMARY] policyVariant=v6.8-dual-mode | complianceDefault=true | optInScope=PER_TRANSACTION | optInGuard=TESTNET_ONLY_HEURISTIC | calcengineSha=60d0380deb664cbfacfb8a12684df4bea85a0dd7188cc92f225a0a8cd062fada | ergateSha=26bdc2937bc34f15351cd21b2cad2a3182713cd8079c3b951c746be86831caec | schemasTopic=0.0.8838546 | schemasVersion=1.1.5 | tc1=BEy_208.080_ERy_202.080_vcu_191.97_buf_10.10 | auditLogPerMint=true | mainnetReadiness=default_path_only_v66_recommended_for_mainnet | lastUpdated=2026-05-03 | ORIGINAL v6.6 PROVENANCE: AMS-III.AV v9.0 + VMR0015 v1.0 Safe Drinking Water dMRV. Methodology: AMS-III.AV \u00a75\u2013\u00a711, VMR0015 \u00a73\u2013\u00a77. Token: VCU-SDW (1 token = 1 tCO2e), Buffer: VCU-SDW-BUFFER (5% of ER). Roles: VVB, PROJECTDEVELOPER, OWNER (= STANDARD_REGISTRY). 11 published immutable schemas on topic 0.0.8838546 at &1.1.0/&1.1.5. GOLDEN FIXTURE TC1: BEy=208.080, ERy=202.080, vcuQuantity=191.97, bufferVcuQuantity=10.10. Engine SHA pins: calcengine=60d0380deb664cbfacfb8a12684df4bea85a0dd7188cc92f225a0a8cd062fada (UNCHANGED from v6.6); ergate=26bdc2937bc34f15351cd21b2cad2a3182713cd8079c3b951c746be86831caec (v6.8 dual-mode merge of v6.6+v6.7); parent v6.6 ergate=d0b32a9ab0a2ce0888352106e2e315fab04b9d37b098e989d824db81e9a9423b. [v6.8.15: sequential mint chain ergate->createvcutoken->mintvcu->createbuffertoken->mintbuffer] [v6.8.16: hardcoded mint recipient (custom-value) for dry-run] [v6.8.18 access-fix: SR-only workflow blocks now also visible to PROJECTDEVELOPER chooserole picks; document signer remains SR via actor=standard_registry on RunEvents; methodology gates unchanged.] [DEV-002 fNRB BASIS: fNRB=0.85 hardcoded per CDM TOOL30 default for India non-renewable biomass fraction. Site-specific override deferred to schema v1.2 (current schema topic 0.0.8838546 frozen at 1.1.5).] [TC1 VERIFICATION (v6.8.18 calc): inputs fractionBoiling=0.85, QPW=14400, xboil=0.005, EFfuel=4.0, fNRB=0.85, EnergyKWH=7500, EFgrid=0.0008. Outputs (verified by direct execution 2026-05-04): BEy=208.080, PEy=6.000, Lky=0, ERy=202.080, vcuQuantity=191.976, bufferVcuQuantity=10.104. Numbers reproduce on any Node 20+ runtime with calcEngineVersion=v6.8.18-methodology-aligned.] [v6.8.18 MINT-CHAIN DRY-RUN DELTA: dataSource=database stripped from all sendToGuardianBlocks so VCs publish to Hedera topic and acquire topicId required by mintDocumentBlock.getObjects. SR-tagged workflow blocks also visible to PROJECTDEVELOPER role (39 blocks) so chooserole users can complete owner-confirmation handshake; document signer remains SR via actor=standard_registry on RunEvents. ergate gate logic and dual-mode VMR0015 compliance unchanged.]\n\n[v6.9.0 INSTITUTIONAL UPGRADE \u2014 schema IRIs kept at v1.1.0; new optional fields added in-place]\nThis release implements full AMS-III.AV v9.0 \u00a75.3 Eq. 1 baseline with SEC computed per Eq. 4, summation over multiple fuel types, fNRB pulled per-project from Project Registration (no more hard-coded India default), VVB DID independence enforced in the gate, Water Quality microbiological-safety attestation required for issuance, buffer percentage configurable per project (default 10% per Verra SDW practice), 24h owner confirmation freshness re-enabled, deterministic monitoringPeriodEnd timestamps (no more new Date()), and crediting period boundary validation. Resolves DEV-002 (fNRB), DEV-003 (m), DEV-004 (SEC), DEV-005 (fuelMix), DEV-006 (units). DEV-001 (Lky=0) remains a documented default \u2014 projects must override with site-specific evidence by setting reg.leakageOverrideTCO2e.",
+  "topicDescription": "AMS-III.AV v9.0 + VMR0015 v1.0 Safe Drinking Water dMRV \u2014 dual-mode policy with VVB validation, verification, owner confirmation, and dual-token (VCU + Buffer) issuance.",
+  "creator": "did:hedera:testnet:FTYpFSq3k8DSeRK65zYYHtngcf4iChkzn8KTq3Qnq9cD_0.0.8845725",
+  "owner": "did:hedera:testnet:FTYpFSq3k8DSeRK65zYYHtngcf4iChkzn8KTq3Qnq9cD_0.0.8845725",
+  "policyTag": "HRPMP-SDW-v6.8.18",
+  "policyRoles": [
+    "VVB",
+    "PROJECTDEVELOPER",
+    "STANDARD_REGISTRY"
+  ],
+  "policyNavigation": [
+    {
+      "role": "VVB",
+      "steps": [
+        {
+          "name": "VVB Accreditation",
+          "block": "vvbaccreditationtab",
+          "level": 1
+        },
+        {
+          "name": "Validation Report",
+          "block": "vvbvalidationtab",
+          "level": 1
+        },
+        {
+          "name": "Verification Report",
+          "block": "vvbverificationtab",
+          "level": 1
+        }
+      ]
+    },
+    {
+      "role": "PROJECTDEVELOPER",
+      "steps": [
+        {
+          "name": "Project Registration",
+          "block": "pdregistrationtab",
+          "level": 1
+        },
+        {
+          "name": "Annual Monitoring",
+          "block": "pdmontab",
+          "level": 1
+        }
+      ]
+    },
+    {
+      "role": "STANDARD_REGISTRY",
+      "steps": [
+        {
+          "name": "Calculation Review",
+          "block": "pdcalctab",
+          "level": 1
+        },
+        {
+          "name": "ER Gate & Mint",
+          "block": "pdminttab",
+          "level": 1
+        },
+        {
+          "name": "Public Audit Report",
+          "block": "reporttab",
+          "level": 1
+        }
+      ]
+    },
+    {
+      "role": "NO_ROLE",
+      "steps": [
+        {
+          "name": "Choose Role",
+          "block": "chooserole",
+          "level": 1
+        }
+      ]
+    },
+    {
+      "role": "OWNER",
+      "steps": []
+    }
+  ],
+  "policyTopics": [
+    {
+      "type": "any",
+      "name": "ProjectTopic",
+      "description": "Safe Drinking Water project documents (AMS-III.AV v9.0 + VMR0015 v1.0)",
+      "static": false,
+      "memoObj": "topic"
+    }
+  ],
+  "policyTokens": [
+    {
+      "templateTokenTag": "VCUToken",
+      "tokenName": "Verified Carbon Unit - Safe Drinking Water",
+      "tokenSymbol": "VCU-SDW",
+      "tokenType": "fungible",
+      "decimals": "2",
+      "enableAdmin": true,
+      "changeSupply": true,
+      "enableFreeze": true,
+      "enableKYC": true,
+      "enableWipe": false
+    },
+    {
+      "templateTokenTag": "VCUBufferToken",
+      "tokenName": "VCU-SDW-BUFFER",
+      "tokenSymbol": "VCUSDWB",
+      "tokenType": "fungible",
+      "decimals": "2",
+      "enableAdmin": true,
+      "changeSupply": true,
+      "enableFreeze": true,
+      "enableKYC": false,
+      "enableWipe": false
+    }
+  ],
+  "policyGroups": [
+    {
+      "name": "VVB_Group",
+      "creator": "VVB",
+      "members": [
+        "VVB"
+      ],
+      "groupRelationshipType": "Multiple",
+      "groupAccessType": "Private"
+    },
+    {
+      "name": "ProjectDeveloper_Group",
+      "creator": "PROJECTDEVELOPER",
+      "members": [
+        "PROJECTDEVELOPER"
+      ],
+      "groupRelationshipType": "Multiple",
+      "groupAccessType": "Private"
+    },
+    {
+      "name": "StandardRegistry_Group",
+      "creator": "STANDARD_REGISTRY",
+      "members": [
+        "STANDARD_REGISTRY"
+      ],
+      "groupRelationshipType": "Multiple",
+      "groupAccessType": "Private"
+    }
+  ],
+  "policyDocumentation": "\n\n## v6.8.2 wiring patch (Option A)\n- KYC grant decoupled from PD submit. Flow: regsend -> regreviewswitch -> kycgrantvcu (on approve only).\n- regreviewswitch conditions:\n    [0] equal: option.status === 'reject'  -> reg_reject_event   -> regrejectinfo\n    [1] equal: option.status === 'approve' -> kyc_approve_event  -> kycgrantvcu\n- NO unconditional fallback. If a document carries no decision, KYC stays denied (gate-correct).\n- KNOWN GAP: no SR-facing review block populates option.status today. Methodology-compliant\n  deployment requires inserting an SR review request block (status enum: approve|reject) whose VC\n  feeds regreviewswitch. The wiring shape is now correct; only the missing review block needs adding.\n- This dry-run cycle relies on chooserole role-join (not KYC) to satisfy monrequest's hasPermission walk.\n\n\n## v6.8.3 chooserole permission fix\n- chooserole.permissions: added 'OWNER' alongside 'NO_ROLE'.\n- Reason: SR (policy owner, isAdmin=true) failed hasPermission on chooserole because\n  NO_ROLE branch requires !user.isAdmin. With OWNER added, the SR can now use chooserole\n  to join PROJECTDEVELOPER group during dry-run replay.\n",
+  "config": {
+    "id": "6c696c85-deb7-45d0-9fdc-f27c31f27be5",
+    "blockType": "interfaceContainerBlock",
+    "defaultActive": true,
+    "permissions": [
+      "ANY_ROLE"
+    ],
+    "uiMetaData": {
+      "title": "Root Container",
+      "description": "Hedera Guardian policy implementing the CDM AMS-III.AV v9.0 small-scale methodology jointly with Verra VMR0015 v1.0 for safe-drinking-water projects. Computes Emission Reductions (ERy = BEy \u2212 PEy \u2212 LEy) from project-monitored water volume, fraction boiling, fNRB, and grid-energy data, and mints VCU-SDW tokens (1 token = 1 tCO2e). 5% of every issuance is routed to a buffer-pool token (VCU-SDW-BUFFER) per VMR0015 \u00a76 risk-management rules. All inputs are oracle-attested via HCS-10, multi-signed by accredited VVBs, and OWNER-confirmed before mint",
+      "type": "blank"
+    },
+    "onErrorAction": "no-action",
+    "schemas": [
+      {
+        "iri": "#3d64e733-1012-4b9f-936d-ab7fce8abd57&1.1.5",
+        "name": "HCS Telemetry (supplementary)",
+        "status": "PUBLISHED_PENDING"
+      },
+      {
+        "iri": "#34f221fd-62b1-4a30-9a8b-a22331f063c6&1.1.5",
+        "name": "Population Census (supplementary)",
+        "status": "PUBLISHED_PENDING"
+      },
+      {
+        "iri": "#f8033bcc-32f6-4fc0-a273-30ceca126497&1.1.5",
+        "name": "Issuance Metadata (supplementary)",
+        "status": "PUBLISHED_PENDING"
+      },
+      {
+        "iri": "#a51367fa-9221-4b48-8d89-2d21495a08c3&1.1.5",
+        "name": "Retirement Request (supplementary)",
+        "status": "PUBLISHED_PENDING"
+      },
+      {
+        "iri": "#7889d742-09d1-473c-aa76-0b92262e7d9f&1.1.0",
+        "name": "Owner Confirmation (anti-rug, ergate PHASE 4)"
+      }
+    ],
+    "tag": "rootcontainer",
+    "children": [
+      {
+        "id": "971207ea-efde-406d-bc15-f3a0dae867b6",
+        "blockType": "policyRolesBlock",
+        "defaultActive": true,
+        "permissions": [
+          "NO_ROLE",
+          "OWNER",
+          "VVB",
+          "PROJECTDEVELOPER",
+          "STANDARD_REGISTRY"
+        ],
+        "uiMetaData": {
+          "title": "Choose Role",
+          "description": "Select your role to enter the policy: PROJECTDEVELOPER (file registration, monitoring, telemetry, population, issuance metadata), VVB (accreditation, validation, verification, multisig signing), or STANDARD_REGISTRY (calculation review, ER gate, mint, public report)"
+        },
+        "roles": [
+          "VVB",
+          "PROJECTDEVELOPER",
+          "STANDARD_REGISTRY"
+        ],
+        "onErrorAction": "no-action",
+        "tag": "chooserole",
+        "children": [],
+        "events": [],
+        "artifacts": []
+      },
+      {
+        "id": "99b93b38-d35c-4a62-8684-2adc846b5b03",
+        "blockType": "interfaceContainerBlock",
+        "defaultActive": true,
+        "permissions": [
+          "VVB"
+        ],
+        "uiMetaData": {
+          "title": "Vvb Main",
+          "description": "Workspace for accredited Validation & Verification Bodies. Submit your accreditation once, then validate project registration documents and verify each annual monitoring submission. Your reputation-weighted multi-signature is required by the ER gate before any mint can proceed",
+          "type": "blank"
+        },
+        "onErrorAction": "no-action",
+        "tag": "vvbmain",
+        "children": [
+          {
+            "id": "ac32bcad-b828-4b4b-bb06-4a46cc795336",
+            "blockType": "informationBlock",
+            "defaultActive": true,
+            "permissions": [
+              "VVB"
+            ],
+            "uiMetaData": {
+              "title": "VVB Dashboard",
+              "description": "Overview of pending validations and verifications, your accreditation status, and your reputation score. The ER gate enforces a reputation-weighted approval sum \u2265 1.5 with no rejections, no duplicates, and no signatures older than 30 days"
+            },
+            "onErrorAction": "no-action",
+            "tag": "vvbdashboard",
+            "children": [],
+            "events": [],
+            "artifacts": []
+          },
+          {
+            "id": "68632597-e888-4900-8ade-31e0510c6245",
+            "blockType": "interfaceContainerBlock",
+            "defaultActive": true,
+            "permissions": [
+              "VVB"
+            ],
+            "uiMetaData": {
+              "title": "Vvb Accreditation Tab",
+              "description": "One-time accreditation submission per VVB Verification Body Standard ISO 14065. Records VVB legal name, accreditation ID issued by an IAF-recognised accreditation body, and validity period. Required before any validation or verification work is accepted"
+            },
+            "tag": "vvbaccreditationtab",
+            "children": [
+              {
+                "id": "158aa7e6-8332-4151-83a4-473117bb8e18",
+                "blockType": "requestVcDocumentBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Accred Request",
+                  "description": "Form: vvbname (VVB legal entity), accreditationid (issued by IAF-recognised accreditation body, e.g., ANSI National Accreditation Board, UKAS), validuntil (ISO date of accreditation expiry)",
+                  "type": "page"
+                },
+                "schema": "#93d7d31e-aeca-4dc3-9945-8e153a6442bc&1.1.0",
+                "onErrorAction": "no-action",
+                "editType": "new",
+                "presetFields": [],
+                "idType": "UUID",
+                "tag": "accredrequest",
+                "children": [],
+                "events": [
+                  {
+                    "target": "accredsend",
+                    "source": "accredrequest",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "0b7450a7-b267-407f-a209-5a233568b999",
+                "blockType": "sendToGuardianBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Accred Send",
+                  "description": "The accreditation Verifiable Credential is signed and written to the policy topic on Hedera. Status set to \"Submitted\". The VVB can now appear in validation and verification multi-sig pools"
+                },
+                "dataType": "vc-documents",
+                "onErrorAction": "no-action",
+                "entityType": "vvb_application",
+                "documentType": "vc",
+                "options": [],
+                "tag": "accredsend",
+                "children": [],
+                "events": [
+                  {
+                    "target": "accredinfo8",
+                    "source": "accredsend",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "bc83873b-5bae-452f-9b60-94958cc8c778",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "VVB Accreditation Submitted",
+                  "description": "Your VVB credentials have been recorded under VMR0015 \u00a75.2 (Validation/Verification Body Requirements). The Guardian topic 0.0.8838546 has anchored your accreditation VC. Pending: Owner approval before assignment to AMS-III.AV \u00a7B.6 project validations",
+                  "type": "text"
+                },
+                "onErrorAction": "no-action",
+                "tag": "accredinfo8",
+                "children": [],
+                "events": [
+                  {
+                    "target": "accredinfo9",
+                    "source": "accredinfo8",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "568a924f-2988-4ca1-b03f-714f979ddcd4",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Renewals",
+                  "description": "When validuntil falls within the next 30 days, the dashboard surfaces a renewal banner. Expired accreditations cause your signature to be excluded from the multi-sig reputation sum"
+                },
+                "onErrorAction": "no-action",
+                "tag": "accredinfo9",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              }
+            ],
+            "events": [],
+            "artifacts": []
+          },
+          {
+            "id": "11ea9046-3016-4cd9-8de7-10e5996a19c8",
+            "blockType": "interfaceContainerBlock",
+            "defaultActive": true,
+            "permissions": [
+              "VVB"
+            ],
+            "uiMetaData": {
+              "title": "Vvb Validation Tab",
+              "description": "Independent validation of the project design (AMS-III.AV \u00a75 applicability, baseline & monitoring plan). The VVB confirms fNRB value (VMR0015 \u00a75.2 MoFA defaults or DOE-approved alternative), declares any leakage emissions, and issues a positive or negative validation opinion",
+              "type": "blank"
+            },
+            "onErrorAction": "no-action",
+            "tag": "vvbvalidationtab",
+            "children": [
+              {
+                "id": "7b20c6f0-df34-4360-a468-119c5fd47ad2",
+                "blockType": "requestVcDocumentBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Val Request",
+                  "description": "Form: validationdate (today), fnrbconfirmed (VMR0015 \u00a75.2: MoFA-published fNRB or DOE alternative; range [0,1]), leakageemissions (tCO2e per VMR0015 \u00a76, \u2264 10% of BE), validationstatus (positive | conditional | negative)",
+                  "type": "page"
+                },
+                "schema": "#d415d74f-12b3-45d4-88d0-bcce8a8ebf47&1.1.6",
+                "onErrorAction": "no-action",
+                "editType": "new",
+                "presetFields": [],
+                "idType": "UUID",
+                "tag": "valrequest",
+                "children": [],
+                "events": [
+                  {
+                    "target": "valsend",
+                    "source": "valrequest",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "01eb9eb1-932b-4137-90a2-3553694b0c3f",
+                "blockType": "sendToGuardianBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Val Send",
+                  "description": "The validation VC is written to the policy topic. If validationstatus = \"negative\", the project cannot proceed to monitoring until the project developer addresses the findings and re-submits"
+                },
+                "dataType": "vc-documents",
+                "onErrorAction": "no-action",
+                "entityType": "validation_report",
+                "documentType": "vc",
+                "tag": "valsend",
+                "children": [],
+                "events": [
+                  {
+                    "target": "valinfo18",
+                    "source": "valsend",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "7cb1fb47-11c8-4bca-b685-defc6d0adb14",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "AMS-III.AV \u00a75 Applicability",
+                  "description": "The VVB confirms the project meets \u00a75 applicability: end-user safe-water service, displaces non-renewable biomass for water boiling, baseline practice is documented, and no double counting with other CDM/VCS activities"
+                },
+                "onErrorAction": "no-action",
+                "tag": "valinfo18",
+                "children": [],
+                "events": [
+                  {
+                    "target": "valinfo19",
+                    "source": "valinfo18",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "f123aa39-7eed-4223-9a62-6a475fe05845",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Baseline Scenario (\u00a77)",
+                  "description": "Validation of the baseline scenario: in absence of the project, households would boil water using non-renewable biomass at fraction m, with energy intensity Xboil \u00d7 EFfuel and fNRB share of biomass that is non-renewable"
+                },
+                "onErrorAction": "no-action",
+                "tag": "valinfo19",
+                "children": [],
+                "events": [
+                  {
+                    "target": "valinfo20",
+                    "source": "valinfo19",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "5b8de22d-d4c1-4ff5-83f4-066a0be8f600",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Monitoring Plan (\u00a711)",
+                  "description": "Validation of the monitoring plan: QPW (m\u00b3/yr safe water delivered), m (fraction boiling), EnergykWh (electricity for treatment), and HCS-10 sensor telemetry frequency"
+                },
+                "onErrorAction": "no-action",
+                "tag": "valinfo20",
+                "children": [],
+                "events": [
+                  {
+                    "target": "valinfo21",
+                    "source": "valinfo20",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "950d1a44-a089-4a0b-bfc0-b4fc0a231e57",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Leakage (\u00a79)",
+                  "description": "Validation of leakage assessment per AMS-III.AV \u00a79 and VMR0015 \u00a76: biomass-displacement leakage and supply-chain leakage. Total LE must remain below 10% of BE"
+                },
+                "onErrorAction": "no-action",
+                "tag": "valinfo21",
+                "children": [],
+                "events": [
+                  {
+                    "target": "valinfo22",
+                    "source": "valinfo21",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "51f61fbb-9516-47b9-997c-b1f027077588",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Suppressed Demand (VMR0015 \u00a76)",
+                  "description": "Confirms the suppressed-demand baseline: 7.5 L/person/day per VMR0015 \u00a76. Above-baseline water consumption beyond this cap is excluded from BEy"
+                },
+                "onErrorAction": "no-action",
+                "tag": "valinfo22",
+                "children": [],
+                "events": [
+                  {
+                    "target": "valinfo23",
+                    "source": "valinfo22",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "901af7ec-cf30-4d0d-b239-ae7dfe992514",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Validation Outcome",
+                  "description": "Positive: project may proceed to monitoring & verification. Conditional: corrections required. Negative: project must redesign before resubmission"
+                },
+                "onErrorAction": "no-action",
+                "tag": "valinfo23",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              },
+              {
+                "id": "7b588e1c-1abf-40d3-a8b1-21c995ea189c",
+                "blockType": "switchBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "val Review Switch",
+                  "description": "Routes the validation outcome: status = \"approve\" advances to verification stage; status = \"reject\" returns to the project developer with VVB review notes for refile. Implements the \u00a711 corrective-action loop"
+                },
+                "conditions": [
+                  {
+                    "type": "equal",
+                    "value": "reject",
+                    "actor": "",
+                    "tag": "valrejected"
+                  },
+                  {
+                    "type": "equal",
+                    "value": "approve",
+                    "actor": "",
+                    "tag": "valapproved"
+                  }
+                ],
+                "executionFlow": "firstTrue",
+                "tag": "valreviewswitch",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              },
+              {
+                "id": "7f9511c5-7661-462d-a71c-dcd581dbba98",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "val rejected \u2014 refile",
+                  "description": "This submission was rejected by the VVB. Please correct the highlighted fields and resubmit",
+                  "type": "text"
+                },
+                "tag": "valrejected",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              },
+              {
+                "id": "f562160d-f8c9-4b7b-8841-0b5172a925d6",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "val approved",
+                  "description": "Submission approved. Forwarded to next stage",
+                  "type": "text"
+                },
+                "tag": "valapproved",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              }
+            ],
+            "events": [],
+            "artifacts": []
+          },
+          {
+            "id": "87bcc898-9d09-44fb-baca-4eb43a3b9509",
+            "blockType": "interfaceContainerBlock",
+            "defaultActive": true,
+            "permissions": [
+              "VVB"
+            ],
+            "uiMetaData": {
+              "title": "Vvb Verification Tab",
+              "description": "Periodic verification of the monitoring report (AMS-III.AV \u00a711). The VVB verifies the calculated VCUs, signs the verification VC with a valid Hedera DID, and submits to the multi-signature pool. Reputation, recency (\u226430 days), and uniqueness are enforced by the ER gate"
+            },
+            "tag": "vvbverificationtab",
+            "children": [
+              {
+                "id": "4f49ade6-baef-410c-a7db-4dab86145b5a",
+                "blockType": "requestVcDocumentBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Ver Request",
+                  "description": "Form: verificationdate, verifiedvcus (verified VCU count for this monitoring period), verificationstatus (positive | conditional | negative). Multi-signature: each VVB signs with a Hedera DID; reputation-weighted sum must \u22651.5",
+                  "type": "page"
+                },
+                "schema": "#51bfeb38-3e08-4b7c-9dc4-f942e2a0f2a0&1.1.6",
+                "onErrorAction": "no-action",
+                "editType": "new",
+                "presetFields": [],
+                "idType": "UUID",
+                "tag": "verrequest",
+                "children": [],
+                "events": [
+                  {
+                    "target": "versend",
+                    "source": "verrequest",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "0275c933-6287-4e78-83e1-79c030fb5c1a",
+                "blockType": "sendToGuardianBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Ver Send",
+                  "description": "The verification VC is written to the policy topic. The signature pool is checked by the ER gate before mint"
+                },
+                "dataType": "vc-documents",
+                "onErrorAction": "no-action",
+                "entityType": "verification_report",
+                "documentType": "vc",
+                "tag": "versend",
+                "children": [],
+                "events": [
+                  {
+                    "target": "verinfo28",
+                    "source": "versend",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "e6fc55c7-cfd0-4a0c-8bc4-f9aa2b1ee516",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "AMS-III.AV \u00a711 Verification",
+                  "description": "Verification confirms that monitored parameters QPW, EnergykWh, and supporting evidence match recorded operational logs and HCS-10 telemetry attestations"
+                },
+                "onErrorAction": "no-action",
+                "tag": "verinfo28",
+                "children": [],
+                "events": [
+                  {
+                    "target": "verinfo29",
+                    "source": "verinfo28",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "838a81d6-0c89-4d69-a6f6-19729ca3583e",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "VVB Multi-Signature",
+                  "description": "Each VVB submission must include: vvbDid (valid Hedera DID), decision (approve|reject), reputation (0..1), signedAt (ISO timestamp \u226430 days). The ER gate computes \u03a3 reputation across approve-decisions and demands \u22651.5"
+                },
+                "onErrorAction": "no-action",
+                "tag": "verinfo29",
+                "children": [],
+                "events": [
+                  {
+                    "target": "verinfo30",
+                    "source": "verinfo29",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "430c15ed-abb8-4631-b5ec-495e1e228a04",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Cross-Check Against Calculation Engine",
+                  "description": "The verifiedvcus value is cross-checked against the engine output (vcuQuantity); the gate rejects when they disagree by more than 0.001 tCO2e"
+                },
+                "onErrorAction": "no-action",
+                "tag": "verinfo30",
+                "children": [],
+                "events": [
+                  {
+                    "target": "verinfo31",
+                    "source": "verinfo30",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "39f5fd81-b8e4-4e86-bc5d-eee9e83ea635",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Site Inspection Evidence",
+                  "description": "VVBs upload site inspection photos, sensor calibration logs, and operational records as artefacts attached to the verification VC"
+                },
+                "onErrorAction": "no-action",
+                "tag": "verinfo31",
+                "children": [],
+                "events": [
+                  {
+                    "target": "verinfo32",
+                    "source": "verinfo31",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "c5161f61-bae9-4224-9a36-7328c3d77d72",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Sampling Plan",
+                  "description": "Per AMS-III.AV \u00a711 the VVB confirms the sampling plan: minimum 100 households per stratum, 90% confidence, 10% precision"
+                },
+                "onErrorAction": "no-action",
+                "tag": "verinfo32",
+                "children": [],
+                "events": [
+                  {
+                    "target": "verinfo33",
+                    "source": "verinfo32",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "7d306e78-2447-46e9-9236-4517cc040adc",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "Verification Outcome",
+                  "description": "Positive: forwarded to the ER gate. Conditional: project addresses findings. Negative: this monitoring period does not mint"
+                },
+                "onErrorAction": "no-action",
+                "tag": "verinfo33",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              },
+              {
+                "id": "f6965c55-92a7-49bb-bc6e-13b67f5abe90",
+                "blockType": "switchBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "ver Review Switch",
+                  "description": "Routes verification outcome: approve \u2192 ER gate; reject \u2192 project developer corrections cycle"
+                },
+                "conditions": [
+                  {
+                    "type": "equal",
+                    "value": "reject",
+                    "actor": "",
+                    "tag": "verrejected"
+                  },
+                  {
+                    "type": "equal",
+                    "value": "approve",
+                    "actor": "",
+                    "tag": "verapproved"
+                  }
+                ],
+                "executionFlow": "firstTrue",
+                "tag": "verreviewswitch",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              },
+              {
+                "id": "a30c8a20-20a8-4ecd-a9ef-ec6fd15dfe64",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "ver rejected \u2014 refile",
+                  "description": "This submission was rejected by the VVB. Please correct the highlighted fields and resubmit",
+                  "type": "text"
+                },
+                "tag": "verrejected",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              },
+              {
+                "id": "5e9a4d7f-c64e-4578-9df2-bb8101ae4b96",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB"
+                ],
+                "uiMetaData": {
+                  "title": "ver approved",
+                  "description": "Submission approved. Forwarded to next stage",
+                  "type": "text"
+                },
+                "tag": "verapproved",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              }
+            ],
+            "events": [],
+            "artifacts": []
+          }
+        ],
+        "events": [],
+        "artifacts": []
+      },
+      {
+        "id": "6f065f05-440d-49c7-a0cd-e105966151a5",
+        "blockType": "interfaceContainerBlock",
+        "defaultActive": true,
+        "permissions": [
+          "PROJECTDEVELOPER",
+          "STANDARD_REGISTRY",
+          "OWNER"
+        ],
+        "uiMetaData": {
+          "title": "Pd Main",
+          "description": "Workspace for the project developer (proponent). File the one-time project registration, then for each annual monitoring period submit: water-quality survey, monitoring data, HCS-10 telemetry attestation, population census, and issuance metadata. After VVB verification and OWNER approval, VCUs are minted to the project account",
+          "type": "blank"
+        },
+        "onErrorAction": "no-action",
+        "tag": "pdmain",
+        "children": [
+          {
+            "id": "4d8b468d-5e95-4fe6-a3a3-b3e913d6f799",
+            "blockType": "informationBlock",
+            "defaultActive": true,
+            "permissions": [
+              "PROJECTDEVELOPER"
+            ],
+            "uiMetaData": {
+              "title": "Developer Dashboard",
+              "description": "Status of your registration, monitoring submissions, validation outcomes, and verification outcomes. Use the side navigation to file each artefact in order: Registration \u2192 Water Quality \u2192 Monitoring \u2192 Telemetry \u2192 Population \u2192 Issuance Metadata"
+            },
+            "tag": "pddashboard",
+            "children": [],
+            "events": [],
+            "artifacts": []
+          },
+          {
+            "id": "d97554dc-6449-44a7-9a87-9f4796fb6811",
+            "blockType": "interfaceContainerBlock",
+            "defaultActive": true,
+            "permissions": [
+              "PROJECTDEVELOPER"
+            ],
+            "uiMetaData": {
+              "title": "Pd Registration Tab",
+              "description": "One-time project registration per AMS-III.AV \u00a75. Provide project name, geographic location, technology type (e.g., POU water purifier, household chlorination, BSF, ceramic filter), and the design-stage parameters: fractionboiling m, xboil (default 0.0018 per VMR0015 \u00a75.3), effuel (tCO2/TJ), and efgrid (tCO2/kWh)"
+            },
+            "tag": "pdregistrationtab",
+            "children": [
+              {
+                "id": "a6175c7b-a074-4575-a6f9-35f6fbdd50d9",
+                "blockType": "requestVcDocumentBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Reg Request",
+                  "description": "Form: projectname, location (country + sub-region), technologytype (POU filter, household chlorination, BSF, ceramic, UV, etc.), fractionboiling m\u2208[0,1], xboil (default 0.0018 per VMR0015 \u00a75.3), effuel (\u226410 tCO2/TJ), efgrid (\u22640.005 tCO2/kWh)",
+                  "type": "page"
+                },
+                "schema": "#18bf0b02-27d1-4551-ac92-f0c03718620c&1.1.0",
+                "onErrorAction": "no-action",
+                "editType": "new",
+                "presetFields": [],
+                "idType": "UUID",
+                "tag": "regrequest",
+                "children": [],
+                "events": [
+                  {
+                    "target": "regsend",
+                    "source": "regrequest",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "b1cb94f5-762f-4b71-83e2-81593c6553ce",
+                "blockType": "sendToGuardianBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Reg Send",
+                  "description": "The project registration VC is written to the policy topic. Status = \"Submitted\". The project advances to the validation stage"
+                },
+                "dataType": "vc-documents",
+                "onErrorAction": "no-action",
+                "entityType": "project",
+                "documentType": "vc",
+                "tag": "regsend",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reginfo40",
+                    "source": "regsend",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  },
+                  {
+                    "source": "regsend",
+                    "target": "regreviewswitch",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "f3899865-b111-4aa3-b567-19cbd31f8890",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Project Boundary (\u00a76)",
+                  "description": "The project boundary includes the safe-water service plant, household end-use, and all energy and biomass flows attributable to the project activity"
+                },
+                "onErrorAction": "no-action",
+                "tag": "reginfo40",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reginfo41",
+                    "source": "reginfo40",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "8766af09-fa12-45bc-8d88-898b8d404369",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Baseline Scenario (\u00a77)",
+                  "description": "In absence of the project, households would boil water at fraction m using non-renewable biomass. Project replaces boiling with safe-water delivery, eliminating BEy"
+                },
+                "onErrorAction": "no-action",
+                "tag": "reginfo41",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reginfo42",
+                    "source": "reginfo41",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "eb40f833-4663-416b-9238-f90e767799af",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Project Scenario (\u00a78)",
+                  "description": "Under the project, water is treated and delivered using grid electricity (EnergykWh \u00d7 EFgrid = PEy). PEy must be < BEy for ER to be positive"
+                },
+                "onErrorAction": "no-action",
+                "tag": "reginfo42",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reginfo43",
+                    "source": "reginfo42",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "ee1c3a32-3dd1-4ec1-ae74-73604ccb828e",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Leakage (\u00a79)",
+                  "description": "LEy includes biomass-displacement leakage from non-project households purchasing biomass from the same supply chain. Decompose into LEbiomass and LEdisplacement when supply-side data are available"
+                },
+                "onErrorAction": "no-action",
+                "tag": "reginfo43",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reginfo44",
+                    "source": "reginfo43",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "d109c432-dec6-4220-8c35-7d124662ffb5",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Monitoring Parameters (\u00a711)",
+                  "description": "QPW (m\u00b3/yr), m (boiling fraction), EnergykWh, plus HCS-10 attested sensor data for flow and energy meters"
+                },
+                "onErrorAction": "no-action",
+                "tag": "reginfo44",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reginfo45",
+                    "source": "reginfo44",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "3354857f-2276-4428-8110-d9b8cb3628a0",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Default Values",
+                  "description": "xboil = 0.0018 GJ/L (VMR0015 \u00a75.3 default). EFfuel: per IPCC 2006 Vol 2 Ch 1 by fuel type. fNRB: MoFA-published values (VMR0015 \u00a75.2) or DOE alternative"
+                },
+                "onErrorAction": "no-action",
+                "tag": "reginfo45",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reginfo46",
+                    "source": "reginfo45",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "b3c81b5f-a063-4720-bc36-ab48ab5b64c4",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Additionality",
+                  "description": "Demonstrate additionality per AMS-III.AV \u00a74 and the CDM Tool 21: investment, barrier, or common-practice analysis. Hash the dossier (SHA-256) and submit in the Issuance Metadata form"
+                },
+                "onErrorAction": "no-action",
+                "tag": "reginfo46",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reginfo47",
+                    "source": "reginfo46",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "ae437196-afcc-40a3-b944-cbc2c2d7a1bb",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Crediting Period",
+                  "description": "Up to 10 years (renewable up to 21) or 7 years (renewable to 21) per CDM small-scale rules. Stated at registration"
+                },
+                "onErrorAction": "no-action",
+                "tag": "reginfo47",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reginfo48",
+                    "source": "reginfo47",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "876af2d9-6650-4353-8084-351192823dd6",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Stakeholder Consultation",
+                  "description": "Project developer documents stakeholder consultation outcomes per VMR0015 \u00a73 and CDM modalities. Include local-language outreach evidence"
+                },
+                "onErrorAction": "no-action",
+                "tag": "reginfo48",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reginfo49",
+                    "source": "reginfo48",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "bed42fd7-606f-4b19-87de-b3901a999656",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Co-Benefits",
+                  "description": "Document SDG co-benefits (SDG 6 clean water, SDG 3 health, SDG 5 gender if applicable). Recorded for premium pricing in registry market"
+                },
+                "onErrorAction": "no-action",
+                "tag": "reginfo49",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              },
+              {
+                "id": "65dedf37-cbb7-4a18-8f1d-dfcec7a9548d",
+                "blockType": "interfaceContainerBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Pd Wq Tab",
+                  "description": "Periodic compliance survey per VMR0015 \u00a73 applicability. Records turbidity (NTU), pH, E. coli count (CFU/100ml), and an overall WHO-class compliance flag. The calculation engine blocks issuance whenever compliant \u2260 true"
+                },
+                "tag": "pdwqtab",
+                "children": [
+                  {
+                    "id": "6f2c188b-ea10-45cd-991a-c4fb22de6ca9",
+                    "blockType": "requestVcDocumentBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Wq Request",
+                      "description": "Form: surveydate, turbidity (NTU, target <5), pH (target 6.5\u20138.5), ecolicount (CFU/100ml, target 0), compliant (true|false). When compliant=false, calcengine blocks issuance per VMR0015 \u00a73",
+                      "type": "page"
+                    },
+                    "schema": "#88a1a1e1-de73-4a77-b63d-1a1a493a8933&1.1.0",
+                    "onErrorAction": "no-action",
+                    "editType": "new",
+                    "presetFields": [],
+                    "idType": "UUID",
+                    "tag": "wqrequest",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "wqsend",
+                        "source": "wqrequest",
+                        "input": "RunEvent",
+                        "output": "RunEvent",
+                        "actor": "standard_registry",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "0dd7daf5-2cc6-4dcf-9f2b-d1facfa1e16b",
+                    "blockType": "sendToGuardianBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Wq Send",
+                      "description": "The water-quality VC is written to the policy topic. Used by the calculation engine to gate issuance"
+                    },
+                    "dataType": "vc-documents",
+                    "onErrorAction": "no-action",
+                    "entityType": "water_quality_report",
+                    "documentType": "vc",
+                    "tag": "wqsend",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "wqinfo54",
+                        "source": "wqsend",
+                        "input": "",
+                        "output": "",
+                        "actor": "",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "0a526ab4-046a-4f71-b5ab-6a4fab82fd2d",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "WHO Drinking-Water Targets",
+                      "description": "WHO Guidelines for Drinking-Water Quality (4th ed.): turbidity <5 NTU, pH 6.5\u20138.5, E. coli 0/100ml"
+                    },
+                    "onErrorAction": "no-action",
+                    "tag": "wqinfo54",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "wqinfo55",
+                        "source": "wqinfo54",
+                        "input": "",
+                        "output": "",
+                        "actor": "",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "94871fba-7022-4b14-a307-d65781e211bf",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Sampling Frequency",
+                      "description": "Minimum monthly composite sample plus quarterly point-source samples. Project developer retains chain-of-custody records"
+                    },
+                    "onErrorAction": "no-action",
+                    "tag": "wqinfo55",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "wqinfo56",
+                        "source": "wqinfo55",
+                        "input": "",
+                        "output": "",
+                        "actor": "",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "c1a8b859-a336-40f4-88bc-586b0a3eefdf",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Lab Accreditation",
+                      "description": "Tests must be conducted by an ISO 17025-accredited laboratory. Lab name and accreditation ID are recorded as artefacts"
+                    },
+                    "onErrorAction": "no-action",
+                    "tag": "wqinfo56",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "wqinfo57",
+                        "source": "wqinfo56",
+                        "input": "",
+                        "output": "",
+                        "actor": "",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "0e6746e5-b826-42f2-86eb-ba07e197d557",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Failed Survey Handling",
+                      "description": "When compliant=false, monitoring continues to capture operational data, but the calculation engine throws \"VMR0015 \u00a73: water quality survey not compliant \u2014 issuance blocked\""
+                    },
+                    "onErrorAction": "no-action",
+                    "tag": "wqinfo57",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "wqinfo58",
+                        "source": "wqinfo57",
+                        "input": "",
+                        "output": "",
+                        "actor": "",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "c5ccb639-962d-4ce7-be21-e7a236bee049",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Corrective Actions",
+                      "description": "Document corrective actions: media replacement, dosing adjustment, source switch. Re-survey to clear the block"
+                    },
+                    "onErrorAction": "no-action",
+                    "tag": "wqinfo58",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "wqinfo59",
+                        "source": "wqinfo58",
+                        "input": "",
+                        "output": "",
+                        "actor": "",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "fd1a34f9-d540-4492-a285-dd451039342e",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Continuous Monitoring",
+                      "description": "For UV / chlorination systems, attach inline sensor logs (free residual chlorine, UV intensity). HCS-10 telemetry records sensor IDs and timestamps"
+                    },
+                    "onErrorAction": "no-action",
+                    "tag": "wqinfo59",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "wqinfo60",
+                        "source": "wqinfo59",
+                        "input": "",
+                        "output": "",
+                        "actor": "",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "98c0eba9-7fd1-45b7-943c-27439c6f2bf3",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Microbial Risk",
+                      "description": "E. coli is the WHO indicator organism. Any positive count triggers a non-compliance flag and immediate corrective action"
+                    },
+                    "onErrorAction": "no-action",
+                    "tag": "wqinfo60",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "wqinfo61",
+                        "source": "wqinfo60",
+                        "input": "",
+                        "output": "",
+                        "actor": "",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "9024e731-3d42-49e8-b7b3-8d3e54050753",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Heavy Metals",
+                      "description": "Annual screen for arsenic, lead, fluoride, nitrate per WHO guideline values, recorded as artefacts"
+                    },
+                    "onErrorAction": "no-action",
+                    "tag": "wqinfo61",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "wqinfo62",
+                        "source": "wqinfo61",
+                        "input": "",
+                        "output": "",
+                        "actor": "",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "b8793525-dc1e-4a1f-a739-72f2e8eb6bb5",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Audit Trail",
+                      "description": "All survey VCs are immutable on Hedera and visible in the Public Audit Report tab"
+                    },
+                    "onErrorAction": "no-action",
+                    "tag": "wqinfo62",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "wqinfo63",
+                        "source": "wqinfo62",
+                        "input": "",
+                        "output": "",
+                        "actor": "",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "4602bbce-0ae9-49ec-8d14-75cac9607e42",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Privacy Considerations",
+                      "description": "Household-level survey data should be aggregated; do not store personally identifying information in on-chain VCs"
+                    },
+                    "onErrorAction": "no-action",
+                    "tag": "wqinfo63",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "wqinfo64",
+                        "source": "wqinfo63",
+                        "input": "",
+                        "output": "",
+                        "actor": "",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "0b5cd70a-cfec-4245-a7df-367d7e2176cf",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "PROJECTDEVELOPER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Survey Schedule",
+                      "description": "Minimum: monthly composite + quarterly point-source. Recommended: weekly during the first six months of operation"
+                    },
+                    "onErrorAction": "no-action",
+                    "tag": "wqinfo64",
+                    "children": [],
+                    "events": [],
+                    "artifacts": []
+                  }
+                ],
+                "events": [],
+                "artifacts": []
+              },
+              {
+                "id": "80437769-2e0d-42e4-810a-539effa4d3cf",
+                "blockType": "switchBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "VVB",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Registration Review Switch",
+                  "description": "Routes registration outcome: approve continues to validation stage; reject returns the developer to a corrections informationBlock with a resubmit affordance under the same projectId. Implements \u00a711 corrective-action loop at the registration stage"
+                },
+                "conditions": [
+                  {
+                    "type": "equal",
+                    "value": "option.status === 'reject'",
+                    "actor": "owner",
+                    "tag": "reg_reject_event"
+                  },
+                  {
+                    "type": "equal",
+                    "value": "option.status === 'approve'",
+                    "actor": "owner",
+                    "tag": "kyc_approve_event"
+                  }
+                ],
+                "executionFlow": "firstTrue",
+                "tag": "regreviewswitch",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              },
+              {
+                "id": "128b6755-2b6d-4767-b157-fc801eb1517e",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "NO_ROLE"
+                ],
+                "uiMetaData": {
+                  "title": "Registration Returned for Correction",
+                  "description": "The Standard Registry or VVB has flagged the project registration for correction. Review the registration-review notes, edit the original Project-Registration VC fields (fractionboiling, xboil, effuel, efgrid, project boundary, additionality declaration), and resubmit. The original messageId remains anchored on topic 0.0.8838546 for full audit history"
+                },
+                "tag": "regrejectinfo",
+                "children": [],
+                "events": [
+                  {
+                    "source": "regreviewswitch",
+                    "target": "regrejectinfo",
+                    "input": "reg_reject_event",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "034c7fea-9887-493c-af4e-613f3f809df5",
+                "blockType": "tokenActionBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Grant KYC: VCU-SDW",
+                  "description": "Grants Hedera KYC status on the VCU-SDW token to the project developer's account so that subsequent mints will be accepted. Required because the token has enableKYC=true. Without this, TokenMint would fail with ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN"
+                },
+                "action": "grantKyc",
+                "useTemplate": true,
+                "template": "VCUToken",
+                "accountType": "default",
+                "accountId": "document.owner",
+                "tag": "kycgrantvcu",
+                "children": [],
+                "events": [
+                  {
+                    "source": "regreviewswitch",
+                    "target": "mintvcu",
+                    "input": "kyc_approve_event",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": true
+                  }
+                ],
+                "artifacts": [],
+                "disabled": true
+              }
+            ],
+            "events": [],
+            "artifacts": []
+          },
+          {
+            "id": "527a1ff5-3237-47ae-b200-3799097d6625",
+            "blockType": "interfaceContainerBlock",
+            "defaultActive": true,
+            "permissions": [
+              "PROJECTDEVELOPER",
+              "STANDARD_REGISTRY",
+              "OWNER"
+            ],
+            "uiMetaData": {
+              "title": "Pd Mon Tab",
+              "description": "Annual monitoring submission per AMS-III.AV \u00a711. Submit waterVolumeM3 (QPW, project-delivered safe-water volume), energyKWH (project electricity consumption), monitoring period dates, and operational days. Subsequent forms collect HCS-10 telemetry, population census, and issuance metadata required for VCU calculation"
+            },
+            "tag": "pdmontab",
+            "children": [
+              {
+                "id": "f6eee5d3-58a2-4f0c-a5ab-f5e5e9cc3752",
+                "blockType": "requestVcDocumentBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Mon Request",
+                  "description": "Form: monitoringperiodstart, monitoringperiodend, waterVolumeM3 (QPW, m\u00b3 delivered), energyKWH, operationaldays. Subsequent forms add HCS-10 telemetry, population census, and issuance metadata before calcengine runs",
+                  "type": "page"
+                },
+                "schema": "#f23a8b6b-1334-4e8b-96b5-05923eeed8d5&1.1.0",
+                "onErrorAction": "no-action",
+                "editType": "new",
+                "presetFields": [],
+                "idType": "UUID",
+                "tag": "monrequest",
+                "children": [],
+                "events": [
+                  {
+                    "target": "monsend",
+                    "source": "monrequest",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "28f3b802-dd19-40fa-a73a-3d09ac075157",
+                "blockType": "sendToGuardianBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Mon Send",
+                  "description": "The monitoring VC is written to the policy topic. The calcengine listens on this event and runs immediately"
+                },
+                "dataType": "vc-documents",
+                "onErrorAction": "no-action",
+                "entityType": "monitoring_report",
+                "documentType": "vc",
+                "tag": "monsend",
+                "children": [],
+                "events": [
+                  {
+                    "target": "moninfo69",
+                    "source": "monsend",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  },
+                  {
+                    "target": "ownerconfirmrequest",
+                    "source": "monsend",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "25303a0e-8c61-4931-9566-c07e92e291ac",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Annual Monitoring \u2014 Note 69",
+                  "description": "Reference to AMS-III.AV \u00a711 monitoring plan and parameter list. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "moninfo69",
+                "children": [],
+                "events": [
+                  {
+                    "target": "moninfo70",
+                    "source": "moninfo69",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "ce4b9886-238a-49eb-8071-b4b64b072f1a",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Annual Monitoring \u2014 Note 70",
+                  "description": "Reference to AMS-III.AV \u00a711 monitoring plan and parameter list. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "moninfo70",
+                "children": [],
+                "events": [
+                  {
+                    "target": "moninfo71",
+                    "source": "moninfo70",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "ab208296-5edc-4145-8a16-0c046cf8d8e2",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Annual Monitoring \u2014 Note 71",
+                  "description": "Reference to AMS-III.AV \u00a711 monitoring plan and parameter list. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "moninfo71",
+                "children": [],
+                "events": [
+                  {
+                    "target": "moninfo72",
+                    "source": "moninfo71",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "b44c1f63-7b71-4940-8606-fc084fcf1831",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Annual Monitoring \u2014 Note 72",
+                  "description": "Reference to AMS-III.AV \u00a711 monitoring plan and parameter list. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "moninfo72",
+                "children": [],
+                "events": [
+                  {
+                    "target": "moninfo73",
+                    "source": "moninfo72",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "41381294-0e32-49c8-9733-f22dc07b2278",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Annual Monitoring \u2014 Note 73",
+                  "description": "Reference to AMS-III.AV \u00a711 monitoring plan and parameter list. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "moninfo73",
+                "children": [],
+                "events": [
+                  {
+                    "target": "moninfo74",
+                    "source": "moninfo73",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "295e5213-10dd-48b7-9ec3-fc91a782e23a",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Annual Monitoring \u2014 Note 74",
+                  "description": "Reference to AMS-III.AV \u00a711 monitoring plan and parameter list. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "moninfo74",
+                "children": [],
+                "events": [
+                  {
+                    "target": "moninfo75",
+                    "source": "moninfo74",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "b8f19530-9b0f-4086-a500-a4b8fbf6835f",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Annual Monitoring \u2014 Note 75",
+                  "description": "Reference to AMS-III.AV \u00a711 monitoring plan and parameter list. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "moninfo75",
+                "children": [],
+                "events": [
+                  {
+                    "target": "moninfo76",
+                    "source": "moninfo75",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "0effc428-7d53-4e96-887c-3cea063aad05",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Annual Monitoring \u2014 Note 76",
+                  "description": "Reference to AMS-III.AV \u00a711 monitoring plan and parameter list. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "moninfo76",
+                "children": [],
+                "events": [
+                  {
+                    "target": "moninfo77",
+                    "source": "moninfo76",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "5065f326-663c-4bec-9fd9-538704159759",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Annual Monitoring \u2014 Note 77",
+                  "description": "Reference to AMS-III.AV \u00a711 monitoring plan and parameter list. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "moninfo77",
+                "children": [],
+                "events": [
+                  {
+                    "target": "moninfo78",
+                    "source": "moninfo77",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "8a41117b-9841-4101-bcfd-23a945c217c8",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Annual Monitoring \u2014 Note 78",
+                  "description": "Reference to AMS-III.AV \u00a711 monitoring plan and parameter list. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "moninfo78",
+                "children": [],
+                "events": [
+                  {
+                    "target": "moninfo79",
+                    "source": "moninfo78",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "5a165019-26ad-4d94-b6ad-4a036270aa17",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Annual Monitoring \u2014 Note 79",
+                  "description": "Reference to AMS-III.AV \u00a711 monitoring plan and parameter list. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "moninfo79",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              },
+              {
+                "id": "05f54888-a164-47ec-85ca-96104867c814",
+                "blockType": "requestVcDocumentBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "HCS Telemetry Submission",
+                  "description": "Form (supplementary VC, schema 50001): topicId (Hedera 0.0.x), sequenceNumber, sensorDid (did:hedera:<network>:<id>_0.0.x), payloadHash (SHA-256 hex-64), attestationSignature (hex 64\u2013128), oracleTimestamp (ISO, \u226490 d). The calcengine validates each field strictly",
+                  "type": "page"
+                },
+                "schema": "#3d64e733-1012-4b9f-936d-ab7fce8abd57&1.1.5",
+                "onErrorAction": "no-action",
+                "editType": "new",
+                "presetFields": [],
+                "idType": "UUID",
+                "tag": "telemetryrequest",
+                "children": [],
+                "events": [
+                  {
+                    "target": "telemetrysend",
+                    "source": "telemetryrequest",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "43237bc0-989d-4ef6-9a25-eacdfb4b52bf",
+                "blockType": "sendToGuardianBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Telemetry Stored",
+                  "description": "The HCS-Telemetry VC is written to the policy topic and consumed by the calculation engine"
+                },
+                "dataType": "vc-documents",
+                "options": [
+                  {
+                    "name": "status",
+                    "value": "Submitted"
+                  }
+                ],
+                "topic": "ProjectTopic",
+                "onErrorAction": "no-action",
+                "entityType": "telemetry_record",
+                "documentType": "vc",
+                "tag": "telemetrysend",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reportblock",
+                    "source": "telemetrysend",
+                    "input": "RefreshEvent",
+                    "output": "RefreshEvent",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "9f9a0fec-6a19-4e08-82b1-8c1b5aef94be",
+                "blockType": "requestVcDocumentBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Population Census Submission",
+                  "description": "Form (supplementary VC, schema 50002): householdsServed, personsPerHousehold, optional LEbiomass and LEdisplacement decomposition, censusDate, censusSource. Required for VMR0015 \u00a76 suppressed-demand 7.5 L/p/d cap (XC5)",
+                  "type": "page"
+                },
+                "schema": "#34f221fd-62b1-4a30-9a8b-a22331f063c6&1.1.5",
+                "onErrorAction": "no-action",
+                "editType": "new",
+                "presetFields": [],
+                "idType": "UUID",
+                "tag": "populationrequest",
+                "children": [],
+                "events": [
+                  {
+                    "target": "populationsend",
+                    "source": "populationrequest",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "0189858f-d122-4448-bf00-6197d8b0e8c5",
+                "blockType": "sendToGuardianBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Population Census Stored",
+                  "description": "The Population-Census VC is written to the policy topic and consumed by the calculation engine"
+                },
+                "dataType": "vc-documents",
+                "options": [
+                  {
+                    "name": "status",
+                    "value": "Submitted"
+                  }
+                ],
+                "topic": "ProjectTopic",
+                "onErrorAction": "no-action",
+                "entityType": "population_record",
+                "documentType": "vc",
+                "tag": "populationsend",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reportblock",
+                    "source": "populationsend",
+                    "input": "RefreshEvent",
+                    "output": "RefreshEvent",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "86e7e50a-7b5c-43b2-8e86-7227f116fbd5",
+                "blockType": "requestVcDocumentBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Issuance Metadata Submission",
+                  "description": "Form (supplementary VC, schema 50003): vintageYear (2020\u20132100), monitoringPeriodStart, monitoringPeriodEnd (\u2264366 d), idempotencyKey (UUIDv4), additionalityProofHash (SHA-256 hex-64), additionalityProofURI (IPFS/HTTPS), bufferAccountId",
+                  "type": "page"
+                },
+                "schema": "#f8033bcc-32f6-4fc0-a273-30ceca126497&1.1.5",
+                "onErrorAction": "no-action",
+                "editType": "new",
+                "presetFields": [],
+                "idType": "UUID",
+                "tag": "issuancemetadatarequest",
+                "children": [],
+                "events": [
+                  {
+                    "target": "issuancemetadatasend",
+                    "source": "issuancemetadatarequest",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "9893c6e1-b733-4828-bb56-f2cd431e85ea",
+                "blockType": "sendToGuardianBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER"
+                ],
+                "uiMetaData": {
+                  "title": "Issuance Metadata Stored",
+                  "description": "The Issuance-Metadata VC is written to the policy topic. Required artefacts for Verra-class registry serialisation"
+                },
+                "dataType": "vc-documents",
+                "options": [
+                  {
+                    "name": "status",
+                    "value": "Submitted"
+                  }
+                ],
+                "topic": "ProjectTopic",
+                "onErrorAction": "no-action",
+                "entityType": "issuance_metadata",
+                "documentType": "vc",
+                "tag": "issuancemetadatasend",
+                "children": [],
+                "events": [
+                  {
+                    "target": "reportblock",
+                    "source": "issuancemetadatasend",
+                    "input": "RefreshEvent",
+                    "output": "RefreshEvent",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "6742960d-56ec-45df-821b-0d070302da25",
+                "blockType": "interfaceContainerBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "VVB",
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "NO_ROLE",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "type": "tab",
+                  "title": "Public Audit Report",
+                  "description": "Read-only public audit trail aggregating: project registration, water-quality compliance, monitoring data, HCS-10 oracle attestation, all eight VMR0015 cross-checks, suppressed-demand audit, VVB multi-signatures, OWNER token confirmation, idempotency key, additionality proof hash, vintage year, monitoring period, and final mint amounts. Visible to all roles including non-authenticated visitors (NO_ROLE)"
+                },
+                "tag": "reporttab",
+                "children": [
+                  {
+                    "id": "2cef5e3d-2eb8-4ba4-a74f-c768ea19fe4b",
+                    "blockType": "reportBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "VVB",
+                      "PROJECTDEVELOPER",
+                      "STANDARD_REGISTRY",
+                      "NO_ROLE",
+                      "OWNER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Issuance Audit Trail",
+                      "description": "Aggregated report joining: registration \u2192 validation \u2192 water-quality \u2192 monitoring \u2192 telemetry \u2192 population \u2192 issuance metadata \u2192 calculation \u2192 gate \u2192 mint. Renders in the Public Audit Report tab as an immutable, signed audit trail readable by all roles"
+                    },
+                    "tag": "reportblock",
+                    "children": [],
+                    "events": [],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "e09f9a10-1aed-4aee-8dac-1093fbbb2333",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "VVB",
+                      "PROJECTDEVELOPER",
+                      "STANDARD_REGISTRY",
+                      "NO_ROLE",
+                      "OWNER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Public Audit Report",
+                      "description": "Aggregated, signed audit trail: registration \u2192 monitoring \u2192 calculation \u2192 ER gate \u2192 mint. Includes all 8 VMR0015 cross-checks (XC1\u2013XC8), HCS-10 oracle attestation, suppressed-demand audit, VVB multisig signatures, OWNER token confirmation, buffer-pool deduction, and idempotency key. Read-only for all roles",
+                      "type": "text"
+                    },
+                    "tag": "reportinfo",
+                    "children": [],
+                    "events": [],
+                    "artifacts": []
+                  }
+                ],
+                "events": [],
+                "artifacts": []
+              }
+            ],
+            "events": [],
+            "artifacts": []
+          },
+          {
+            "id": "92142d2e-7258-4ea9-9542-0450b012e5ae",
+            "blockType": "interfaceContainerBlock",
+            "defaultActive": true,
+            "permissions": [
+              "STANDARD_REGISTRY",
+              "PROJECTDEVELOPER",
+              "OWNER"
+            ],
+            "uiMetaData": {
+              "title": "Pd Calc Tab",
+              "description": "OWNER-only review of the AMS-III.AV \u00a77-\u00a710 calculation: BEy = QPW \u00d7 m \u00d7 Xboil \u00d7 EFfuel \u00d7 fNRB; PEy = EnergykWh \u00d7 EFgrid; LEy = LEbiomass + LEdisplacement; ERy = BEy \u2212 PEy \u2212 LEy. All eight VMR0015 cross-checks (XC1\u2013XC8) are visible in the cross-check JSON. The calc engine writes a Calculation-Results VC; the ER gate then validates VVB multi-sig, OWNER token confirmation, and freshness windows",
+              "type": "blank"
+            },
+            "onErrorAction": "no-action",
+            "tag": "pdcalctab",
+            "children": [
+              {
+                "id": "91813a8c-1bbe-46ca-86df-af08e74ea0b7",
+                "blockType": "customLogicBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "AMS-III.AV Calculation Engine",
+                  "description": "Reads registration, water-quality, monitoring, telemetry, population, and issuance-metadata VCs. Validates ranges, HCS-10 attestation, dual-attestation leakage reconciliation. Computes BEy, PEy, LEy, ERy. Runs VMR0015 cross-checks XC1-XC8 (BE>0, PE/LE non-neg, LE<10% BE, country-specific suppressed-demand cap from validationData.suppressedDemandLpDay, BE growth \u2264+10% with explicit first-year exemption, 60kt SSC cap, 5% buffer). Writes Calculation-Results VC with BEy/PEy/LEy/ERy/vcu/buffer/serial/bufferAccountId"
+                },
+                "expression": "function calc() {\n  // \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n  // AMS-III.AV v9.0 \u00a75.3 full Eq. 1 + \u00a75.5 Eq. 6 + \u00a75.6 Eq. 7\n  // BEy = QPWy \u00d7 m \u00d7 Xboil \u00d7 SEC \u00d7 \u03a3_i ( BLfuel,i \u00d7 fi \u00d7 EFprojected_fossil_fuel,i \u00d7 10\u207b\u2079 )\n  // SEC = [ WH \u00d7 (Tf \u2212 Ti) + 0.01 \u00d7 WHE ] / \u03b7wb        (\u00a75.3 Eq. 4)\n  // PEy = PEFF,y + PEEC,y                              (\u00a75.5 Eq. 6)\n  // LEy = AMS-I.E. provisions where relevant\n  // ERy = BEy \u2212 PEy \u2212 LEy\n  // VMR0015 \u00a76: buffer = bufferPct \u00d7 ERy\n  // \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\n  function csOf(d) {\n    if (!d || typeof d !== 'object') return null;\n    var doc = d.document || d;\n    if (doc && doc.credentialSubject) {\n      var cs = doc.credentialSubject;\n      if (Array.isArray(cs) && cs.length) return cs[0];\n      if (typeof cs === 'object') return cs;\n    }\n    if (doc && doc.policyId && doc['@context']) return doc;\n    return null;\n  }\n  function findBySchema(iri) {\n    var pool = (typeof documents !== 'undefined' && documents) ? documents : [];\n    if (!Array.isArray(pool)) pool = [pool];\n    for (var i = 0; i < pool.length; i++) {\n      var cs = csOf(pool[i]);\n      if (!cs) continue;\n      var t = cs.type || (pool[i].document && pool[i].document.type) || '';\n      var ctx = cs['@context'] || (pool[i].document && pool[i].document['@context']) || '';\n      var ctxStr = Array.isArray(ctx) ? ctx.join('|') : String(ctx);\n      if (t === iri || t.indexOf(iri) >= 0 || ctxStr.indexOf(iri) >= 0) return cs;\n    }\n    return null;\n  }\n  function num(v, n) {\n    if (v === undefined || v === null || v === '')\n      throw new Error('calcengine: missing input ' + n);\n    var x = Number(v);\n    if (!isFinite(x)) throw new Error('calcengine: non-numeric ' + n + ' (got ' + v + ')');\n    return x;\n  }\n  function numOpt(v, dflt) {\n    if (v === undefined || v === null || v === '') return dflt;\n    var x = Number(v);\n    if (!isFinite(x)) return dflt;\n    return x;\n  }\n\n  // \u2500\u2500 Schema IRIs (v1.2.0 institutional) \u2500\u2500\n  var REG_IRI = '#18bf0b02-27d1-4551-ac92-f0c03718620c&1.1.0';\n  var MON_IRI = '#f23a8b6b-1334-4e8b-96b5-05923eeed8d5&1.1.0';\n  var WQ_IRI  = '#88a1a1e1-de73-4a77-b63d-1a1a493a8933&1.1.0';\n\n  var reg = findBySchema(REG_IRI) || (document || {});\n  var mon = findBySchema(MON_IRI) || {};\n\n  // \u2500\u2500 Inputs \u2500\u2500\n  var QPW_m3 = num(mon.waterVolumeM3, 'waterVolumeM3');\n  var QPW_L  = QPW_m3 * 1000;                                  // \u00a75.3 requires litres\n  var Xboil  = num(reg.xboil, 'xboil');                        // fraction of users replacing boiling\n  var m_func = numOpt(mon.m_functional, numOpt(reg.m_functional, 1.0));  // \u00a75.3 m, default 1.0 if not monitored\n  var fNRB   = numOpt(reg.fnrb, 0.85);                         // CDM TOOL30 default if not site-specific\n\n  // \u2500\u2500 \u00a75.3 Eq. 4: SEC = [WH \u00d7 (Tf \u2212 Ti) + 0.01 \u00d7 WHE] / \u03b7wb \u2500\u2500\n  // Defaults per \u00a75.3: WH=4.186 kJ/(kg\u00b7K), Tf=100, Ti=20, WHE=2260 kJ/kg, \u03b7wb depends on stove type\n  var WH    = numOpt(reg.WH, 4.186);\n  var Tf    = numOpt(reg.Tf, 100);\n  var Ti    = numOpt(reg.Ti, 20);\n  var WHE   = numOpt(reg.WHE, 2260);\n  var etawb = numOpt(reg.etawb, 0.20);   // 0.10 three-stone, 0.20 woody biomass, 0.50 fossil\n  var SEC = (WH * (Tf - Ti) + 0.01 * WHE) / etawb;             // kJ/L\n\n  // \u2500\u2500 \u03a3 over fuel types i \u2500\u2500\n  // Each entry: { fuelType, BLfuel (fraction 0..1), EFfuel_tCO2_per_TJ, fNRB_override? }\n  // If fuelMix not provided, fall back to single-fuel legacy mode using reg.effuel as t CO2/TJ\n  // and BLfuel=1, fi=fNRB.\n  var fuelMix = (mon.fuelMixActual && mon.fuelMixActual.length) ? mon.fuelMixActual\n              : (reg.fuelMix && reg.fuelMix.length) ? reg.fuelMix\n              : null;\n\n  // Default per-fuel EFs (t CO2/TJ) from AMS-I.E. / IPCC defaults if not in mix entry\n  var FUEL_EF_DEFAULT = {\n    'firewood':       112000,  // IPCC default (woody biomass NCV-basis converted; fNRB applies)\n    'wood':           112000,\n    'charcoal':       112000,\n    'kerosene':        71900,  // IPCC 2006 NGGI Table 2.5\n    'lpg':             63100,\n    'diesel':          74100,\n    'gasoline':        69300,\n    'naturalgas':      56100,\n    'biomass':        112000,\n    'fossil':          74100   // generic fossil fallback\n  };\n\n  var sumI = 0;  // \u03a3_i ( BLfuel,i \u00d7 fi \u00d7 EFi \u00d7 10\u207b\u2079 )\n  var fuelMixUsed = [];\n  if (fuelMix) {\n    var totalBL = 0;\n    for (var i = 0; i < fuelMix.length; i++) {\n      var f = fuelMix[i];\n      var BL = num(f.BLfuel, 'fuelMix['+i+'].BLfuel');\n      var ftype = String(f.fuelType || '').toLowerCase().replace(/\\s+/g,'');\n      var EF = numOpt(f.EFfuel_tCO2_per_TJ, FUEL_EF_DEFAULT[ftype]);\n      if (EF === undefined) throw new Error('calcengine: no EF for fuelType '+f.fuelType);\n      // fi: for biomass use fNRB (override available per-fuel); for fossil fi=1.0\n      var isBiomass = (ftype === 'firewood' || ftype === 'wood' || ftype === 'charcoal' || ftype === 'biomass');\n      var fi = numOpt(f.fNRB_override, isBiomass ? fNRB : 1.0);\n      sumI += BL * fi * EF * 1e-9;\n      totalBL += BL;\n      fuelMixUsed.push({fuelType: f.fuelType, BLfuel: BL, fi: fi, EF_tCO2_per_TJ: EF});\n    }\n    if (Math.abs(totalBL - 1.0) > 0.01)\n      throw new Error('calcengine: fuelMix BLfuel must sum to 1.0 (got '+totalBL+')');\n  } else {\n    // Legacy single-fuel mode: reg.effuel must be t CO2/TJ in this version\n    var EFleg = num(reg.effuel, 'effuel');\n    sumI = 1.0 * fNRB * EFleg * 1e-9;\n    fuelMixUsed.push({fuelType: 'unspecified-legacy', BLfuel: 1.0, fi: fNRB, EF_tCO2_per_TJ: EFleg});\n  }\n\n  // \u2500\u2500 \u00a75.3 Eq. 1: BEy = QPW \u00d7 m \u00d7 Xboil \u00d7 SEC \u00d7 \u03a3 \u2500\u2500\n  var BEy = QPW_L * m_func * Xboil * SEC * sumI;\n\n  // \u2500\u2500 \u00a75.5 Eq. 6: PEy = PEFF,y (project fossil) + PEEC,y (electricity, TOOL05) \u2500\u2500\n  var EnergyKWH = numOpt(mon.energyKWH, 0);\n  var EFgrid    = numOpt(reg.efgrid, 0);\n  var TDLoss    = numOpt(reg.gridTDLossFraction, 0);   // TOOL05 transmission/dist losses\n  var PEEC = EnergyKWH * EFgrid * (1 + TDLoss) / 1000; // kWh \u00d7 tCO2/MWh \u00d7 loss \u2192 tCO2 ; assume EFgrid in tCO2/MWh? careful\n  // Convention: store EFgrid as tCO2/kWh (matches v1.1.0 inputs where EFgrid=0.0008 was tCO2/kWh)\n  // \u2192 revert: PEEC = EnergyKWH \u00d7 EFgrid \u00d7 (1 + TDLoss)\n  PEEC = EnergyKWH * EFgrid * (1 + TDLoss);\n\n  var PEFF_kg     = numOpt(mon.projectFossilFuelKg, 0);\n  var PEFF_EF     = numOpt(reg.projectFossilFuelEF_tCO2_per_kg, 0);\n  var PEFF        = PEFF_kg * PEFF_EF;\n\n  var PEy = PEEC + PEFF;\n\n  // \u2500\u2500 \u00a75.4 Leakage \u2500\u2500\n  // Default Lky = 0 (\"negligible\" per \u00a75.4 / AMS-I.E.); allow site-specific override via reg.leakageOverrideTCO2e\n  var Lky = numOpt(reg.leakageOverrideTCO2e, 0);\n\n  // \u2500\u2500 ERy \u2500\u2500\n  var ERy = BEy - PEy - Lky;\n\n  // \u2500\u2500 VMR0015 \u00a76 buffer (configurable per project, default 10%) \u2500\u2500\n  var bufferPct = numOpt(reg.bufferPct, 0.10);\n  if (bufferPct < 0.05 || bufferPct > 0.30)\n    throw new Error('calcengine: bufferPct must be between 5% and 30% (got '+bufferPct+')');\n  var bufferVcu = ERy * bufferPct;\n  var vcuQuantity = ERy - bufferVcu;\n\n  // \u2500\u2500 Deterministic timestamp: monitoringPeriodEnd from Annual Monitoring (replay-safe) \u2500\u2500\n  var monPeriodEnd = mon.monitoringPeriodEnd || mon.periodEnd || null;\n\n  function r3(x) { return Math.round(x * 1000) / 1000; }\n\n  return Object.assign({}, document || {}, {\n    // \u2500\u2500 Headline numbers \u2500\u2500\n    netEmissionReductionsTCO2e: r3(ERy),\n    baselineEmissionsTCO2e: r3(BEy),\n    projectEmissionsTCO2e: r3(PEy),\n    projectEmissionsBreakdown: { PEEC: r3(PEEC), PEFF: r3(PEFF) },\n    leakageEmissionsTCO2e: r3(Lky),\n    vcuQuantity: r3(vcuQuantity),\n    bufferVcuQuantity: r3(bufferVcu),\n    bufferPctApplied: bufferPct,\n    // \u2500\u2500 Methodology trace (auditor-grade) \u2500\u2500\n    methodologyId: 'AMS-III.AV-v9.0+VMR0015-v1.0',\n    calcEngineVersion: 'v6.9.0-institutional',\n    calcBasis: 'AMS-III.AV-v9.0 \u00a75.3 Eq.1 (full); \u00a75.3 Eq.4 SEC; \u00a75.5 Eq.6 PEy=PEFF+PEEC; \u00a75.6 Eq.7 ERy; \u00a75.4 LEy; VMR0015-v1.0 \u00a76 buffer',\n    calcInputsTrace: {\n      QPW_m3: QPW_m3, QPW_L: QPW_L,\n      m_functional: m_func, Xboil: Xboil,\n      SEC_kJ_per_L: r3(SEC),\n      SEC_components: { WH: WH, Tf: Tf, Ti: Ti, WHE: WHE, etawb: etawb },\n      fNRB_default: fNRB,\n      fuelMix: fuelMixUsed,\n      sigma_term: sumI,\n      EnergyKWH: EnergyKWH, EFgrid: EFgrid, TDLossFraction: TDLoss, PEEC: r3(PEEC),\n      projectFossilFuelKg: PEFF_kg, projectFossilFuelEF: PEFF_EF, PEFF: r3(PEFF),\n      leakageOverrideTCO2e: Lky,\n      bufferPct: bufferPct\n    },\n    // \u2500\u2500 Replay-deterministic timestamp (not new Date()) \u2500\u2500\n    calcedAtMonitoringPeriodEnd: monPeriodEnd,\n    calcedAt: monPeriodEnd || new Date().toISOString()  // fallback only if mon period missing\n  });\n}\nreturn calc();",
+                "onErrorAction": "no-action",
+                "selectedScriptLanguage": "javascript",
+                "documentSigner": "owner",
+                "idType": "UUID",
+                "outputSchema": "#4bb9c304-1bd0-49d7-81c8-ece542ae5a58",
+                "tag": "calcengine",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcsend",
+                    "source": "calcengine",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "4a429d48-4b83-4284-a2e3-5757d257ffa4",
+                "blockType": "sendToGuardianBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Send",
+                  "description": "The Calculation-Results VC is written to the policy topic. The ER gate listens on this event"
+                },
+                "schema": "#4bb9c304-1bd0-49d7-81c8-ece542ae5a58&1.1.0",
+                "dataType": "vc-documents",
+                "onErrorAction": "no-action",
+                "options": [],
+                "entityType": "er_calculation",
+                "documentType": "vc",
+                "tag": "calcsend",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo84",
+                    "source": "calcsend",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  },
+                  {
+                    "target": "ergate",
+                    "source": "calcsend",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "95a8208b-c916-49e9-89d2-c1f80c330114",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 84",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo84",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo85",
+                    "source": "calcinfo84",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "fa42a3bf-865a-48a2-8bc7-70f4c2a78760",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 85",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo85",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo86",
+                    "source": "calcinfo85",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "3c8b5418-1931-4916-84dd-baa926d02ad4",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 86",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo86",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo87",
+                    "source": "calcinfo86",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "29020bd0-2a5b-4107-80a0-463bc9379a97",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 87",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo87",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo88",
+                    "source": "calcinfo87",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "a4112725-f40a-4d3f-84ec-ce8bac43509c",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 88",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo88",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo89",
+                    "source": "calcinfo88",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "1f9c5142-db79-4d67-911d-85d9e38a168f",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 89",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo89",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo90",
+                    "source": "calcinfo89",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "21efbc62-793f-4454-811d-f41a1711bf98",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 90",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo90",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo91",
+                    "source": "calcinfo90",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "45c371a6-fd2e-48a0-b8f2-2aa444cc648f",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 91",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo91",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo92",
+                    "source": "calcinfo91",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "2e76a130-b9d9-47ea-b72d-50a733d80be5",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 92",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo92",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo93",
+                    "source": "calcinfo92",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "5e0c927b-3736-462a-9db8-7c1c565fe25f",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 93",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo93",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo94",
+                    "source": "calcinfo93",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "4ab8fbcc-3722-4db3-9194-81e2ba5576f1",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 94",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo94",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo95",
+                    "source": "calcinfo94",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "eea4a6f3-6f7b-4189-ab55-b7bda13852ce",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 95",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo95",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo96",
+                    "source": "calcinfo95",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "7e0450c0-2d79-406a-b322-4eb8594a1e49",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 96",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo96",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo97",
+                    "source": "calcinfo96",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "01fdb90b-bf23-47d8-a664-203c54fc8c06",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 97",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo97",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo98",
+                    "source": "calcinfo97",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "7ce50356-7dd4-4abc-a358-9443eb2de3db",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 98",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo98",
+                "children": [],
+                "events": [
+                  {
+                    "target": "calcinfo99",
+                    "source": "calcinfo98",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "1860f064-80fd-4ee1-9f42-43c2fd7440cc",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "PROJECTDEVELOPER",
+                  "STANDARD_REGISTRY",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Calc Info 99",
+                  "description": "Policy guidance note. Refer to the policy description for the relevant AMS-III.AV / VMR0015 section and cross-check rule"
+                },
+                "onErrorAction": "no-action",
+                "tag": "calcinfo99",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              }
+            ],
+            "events": [],
+            "artifacts": []
+          },
+          {
+            "id": "1dc41239-931f-4906-9746-f1b806e286a9",
+            "blockType": "interfaceContainerBlock",
+            "defaultActive": true,
+            "permissions": [
+              "STANDARD_REGISTRY",
+              "PROJECTDEVELOPER",
+              "OWNER"
+            ],
+            "uiMetaData": {
+              "title": "Pd Mint Tab",
+              "description": "Final OWNER step. Set ownerConfirmation = true, confirmedAmount = vcuQuantity, and confirmationTimestamp within the last 24 hours. The ER gate enforces ERy>0, vcuQuantity>0, valid VVB multi-sig (DID format, no duplicates, \u226430 d, no rejections, reputation sum \u22651.5), then triggers parallel mints: 95% to VCU-SDW (issuance) and 5% to VCU-SDW-BUFFER (buffer pool)",
+              "type": "blank"
+            },
+            "onErrorAction": "no-action",
+            "tag": "pdminttab",
+            "children": [
+              {
+                "id": "c16f1b1a-c400-48c5-9a45-5e13ff789927",
+                "blockType": "requestVcDocumentBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Owner Mint Confirmation",
+                  "description": "Anti-rug: STANDARD_REGISTRY confirms vcuQuantity and timestamp before mint chain proceeds. Required by ergate PHASE 4",
+                  "type": "page"
+                },
+                "schema": "#7889d742-09d1-473c-aa76-0b92262e7d9f&1.1.0",
+                "onErrorAction": "no-action",
+                "editType": "new",
+                "presetFields": [],
+                "idType": "UUID",
+                "tag": "ownerconfirmrequest",
+                "events": [
+                  {
+                    "target": "ownerconfirmsend",
+                    "source": "ownerconfirmrequest",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "89cab1d4-825d-4e5e-87a7-27226c97a878",
+                "blockType": "sendToGuardianBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Owner Confirmation Send",
+                  "description": "Persists ownerConfirmation VC to policy topic; ergate PHASE 4 reads it as ownerConfirmationData"
+                },
+                "schema": "#7889d742-09d1-473c-aa76-0b92262e7d9f&1.1.0",
+                "dataType": "vc-documents",
+                "onErrorAction": "no-action",
+                "options": [],
+                "entityType": "owner_confirmation",
+                "documentType": "vc",
+                "tag": "ownerconfirmsend",
+                "artifacts": [],
+                "events": [
+                  {
+                    "target": "calcengine",
+                    "source": "ownerconfirmsend",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ]
+              },
+              {
+                "id": "e71c3d20-9386-4616-a5f3-e4094d68b40b",
+                "blockType": "customLogicBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "ER Gate Tolerance Check",
+                  "description": "Coerces string-typed numeric KPIs to Number(), enforces ERy>0 / vcuQuantity>0 / bufferVcuQuantity\u22650. Validates VVB multi-sig (Hedera DID format, \u226430 days old, no duplicates, no rejections, reputation-weighted approval sum \u22651.5). Validates OWNER token confirmation (ownerConfirmation=true, confirmedAmount=vcuQuantity \u00b10.001, \u226424 h fresh). On PASS, fires parallel events to mintvcu (95%) and mintbuffer (5%)"
+                },
+                "onErrorAction": "no-action",
+                "selectedScriptLanguage": "JAVASCRIPT",
+                "expression": "function gate() {\n  function csOf(d) {\n    if (!d || typeof d !== 'object') return null;\n    var doc = d.document || d;\n    if (doc && doc.credentialSubject) {\n      var cs = doc.credentialSubject;\n      if (Array.isArray(cs) && cs.length) return cs[0];\n      if (typeof cs === 'object') return cs;\n    }\n    if (doc && doc.policyId && doc['@context']) return doc;\n    return null;\n  }\n  function csWithDocOf(d) {\n    if (!d || typeof d !== 'object') return null;\n    var cs = csOf(d);\n    if (!cs) return null;\n    var doc = d.document || d;\n    return { cs: cs, issuer: doc.issuer || cs.issuer || null, owner: d.owner || null };\n  }\n  function findBySchema(iri) {\n    var pool = (typeof documents !== 'undefined' && documents) ? documents : [];\n    if (!Array.isArray(pool)) pool = [pool];\n    for (var i = 0; i < pool.length; i++) {\n      var w = csWithDocOf(pool[i]);\n      if (!w) continue;\n      var t = w.cs.type || '';\n      var ctx = w.cs['@context'] || (pool[i].document && pool[i].document['@context']) || '';\n      var ctxStr = Array.isArray(ctx) ? ctx.join('|') : String(ctx);\n      if (t === iri || t.indexOf(iri) >= 0 || ctxStr.indexOf(iri) >= 0) return w;\n    }\n    return null;\n  }\n  function num(v, n) {\n    if (v === undefined || v === null || v === '')\n      throw new Error('ergate: missing ' + n);\n    var x = Number(v);\n    if (!isFinite(x)) throw new Error('ergate: non-numeric ' + n);\n    return x;\n  }\n  function parseDate(s) {\n    if (!s) return null;\n    var t = Date.parse(s);\n    return isFinite(t) ? new Date(t) : null;\n  }\n\n  var d = document || {};\n\n  // \u2500\u2500 PHASE 1: numeric guards on calcengine output \u2500\u2500\n  var ERy = num(d.netEmissionReductionsTCO2e, 'netEmissionReductionsTCO2e');\n  var vcu = num(d.vcuQuantity, 'vcuQuantity');\n  var buf = num(d.bufferVcuQuantity, 'bufferVcuQuantity');\n  if (ERy <= 0) throw new Error('ergate: ERy must be > 0 (got '+ERy+')');\n  if (vcu <= 0) throw new Error('ergate: vcuQuantity must be > 0');\n  if (buf <  0) throw new Error('ergate: bufferVcuQuantity must be >= 0');\n  if (Math.abs((vcu + buf) - ERy) > 0.05)\n    throw new Error('ergate: vcuQuantity + buffer must equal ERy (got '+(vcu+buf)+' vs '+ERy+')');\n\n  // \u2500\u2500 PHASE 2: VVB validation + verification (+ DID INDEPENDENCE) \u2500\u2500\n  var VAL_IRI = '#d415d74f-12b3-45d4-88d0-bcce8a8ebf47&1.1.6';\n  var VER_IRI = '#51bfeb38-3e08-4b7c-9dc4-f942e2a0f2a0&1.1.6';\n  var OC_IRI  = '#7889d742-09d1-473c-aa76-0b92262e7d9f&1.1.0';\n  var WQ_IRI  = '#88a1a1e1-de73-4a77-b63d-1a1a493a8933&1.1.0';\n  var REG_IRI = '#18bf0b02-27d1-4551-ac92-f0c03718620c&1.1.0';\n  var MON_IRI = '#f23a8b6b-1334-4e8b-96b5-05923eeed8d5&1.1.0';\n\n  var valW = findBySchema(VAL_IRI);\n  var verW = findBySchema(VER_IRI);\n  if (!valW) throw new Error('ergate: no VVB Validation Report found in documents[]');\n  if (!verW) throw new Error('ergate: no VVB Verification Report found in documents[]');\n  var val = valW.cs, ver = verW.cs;\n  var valStatus = (val.validationstatus || '').toString().toLowerCase();\n  var verStatus = (ver.verificationstatus || '').toString().toLowerCase();\n  if (valStatus !== 'approved')\n    throw new Error('ergate: validationstatus must be \"approved\" (got \"'+val.validationstatus+'\")');\n  if (verStatus !== 'approved')\n    throw new Error('ergate: verificationstatus must be \"approved\" (got \"'+ver.verificationstatus+'\")');\n\n  // VVB DID INDEPENDENCE \u2014 validator must not equal verifier\n  var valIssuer = valW.issuer || val.issuer || valW.owner;\n  var verIssuer = verW.issuer || ver.issuer || verW.owner;\n  if (!valIssuer || !verIssuer)\n    throw new Error('ergate: VVB issuer DID missing on validation or verification report');\n  // DRY_RUN_MODE escape: when reg.dryRunMode === true, skip independence (testnet solo dev only).\n  // Real pilots leave dryRunMode unset \u2192 strict enforcement.\n  var regWForMode = findBySchema(REG_IRI);\n  var dryRunMode = regWForMode && regWForMode.cs && (regWForMode.cs.dryRunMode === true || regWForMode.cs.dryRunMode === 'true');\n  var vvbIndependenceEnforced = true;\n  if (valIssuer === verIssuer) {\n    if (dryRunMode) {\n      vvbIndependenceEnforced = false;\n    } else {\n      throw new Error('ergate: VVB independence violated \u2014 validator and verifier issuer DIDs must differ (got \"'+valIssuer+'\" for both). Set Project Registration dryRunMode=true to skip in solo testnet dry runs.');\n    }\n  }\n\n  // \u2500\u2500 PHASE 3: Water Quality microbiological safety attestation (\u00a75.3 m parameter req iii) \u2500\u2500\n  var wqW = findBySchema(WQ_IRI);\n  if (!wqW) throw new Error('ergate: no Water Quality Survey (v1.2.0) found \u2014 microbiological safety attestation required');\n  var wq = wqW.cs;\n  var microConfirmed = (wq.microSafetyConfirmed === true || wq.microSafetyConfirmed === 'true');\n  if (!microConfirmed)\n    throw new Error('ergate: microSafetyConfirmed must be true on Water Quality Survey');\n  if (!wq.microSafetyMethod)\n    throw new Error('ergate: microSafetyMethod required on Water Quality Survey');\n  if (!wq.microSafetyDate)\n    throw new Error('ergate: microSafetyDate required on Water Quality Survey');\n\n  // \u2500\u2500 PHASE 4: Owner anti-rug confirmation + 24h freshness \u2500\u2500\n  var ocW = findBySchema(OC_IRI);\n  if (!ocW) throw new Error('ergate: no Owner Confirmation found');\n  var oc = ocW.cs;\n  if (oc.ownerConfirmation !== true && oc.ownerConfirmation !== 'true')\n    throw new Error('ergate: ownerConfirmation must be true');\n  var confAmt = num(oc.confirmedAmount, 'confirmedAmount');\n  if (Math.abs(confAmt - vcu) > 0.01)\n    throw new Error('ergate: confirmedAmount ('+confAmt+') must equal vcuQuantity ('+vcu+')');\n\n  // 24h freshness: confirmation must be within 24h of monitoring period end (deterministic \u2014 no wall clock)\n  var monW = findBySchema(MON_IRI);\n  var monPeriodEnd = (monW && monW.cs && (monW.cs.monitoringPeriodEnd || monW.cs.periodEnd)) || d.calcedAtMonitoringPeriodEnd;\n  var ocAt = oc.confirmedAt || oc.signedAt || oc.timestamp;\n  var ocDate = parseDate(ocAt);\n  var monDate = parseDate(monPeriodEnd);\n  if (monDate && ocDate) {\n    var diffH = Math.abs(ocDate - monDate) / 3600000;\n    if (diffH > 24)\n      throw new Error('ergate: ownerConfirmation must be within 24h of monitoringPeriodEnd (diff='+diffH.toFixed(1)+'h)');\n  } else if (!ocDate) {\n    throw new Error('ergate: ownerConfirmation timestamp (confirmedAt) required');\n  }\n\n  // \u2500\u2500 PHASE 5: Crediting period boundary \u2500\u2500\n  var regW = findBySchema(REG_IRI);\n  if (!regW) throw new Error('ergate: no Project Registration (v1.2.0) found');\n  var reg = regW.cs;\n  var cpStart = parseDate(reg.creditingPeriodStart);\n  var cpEnd   = parseDate(reg.creditingPeriodEnd);\n  if (!cpStart || !cpEnd)\n    throw new Error('ergate: Project Registration must declare creditingPeriodStart and creditingPeriodEnd');\n  if (cpEnd <= cpStart)\n    throw new Error('ergate: creditingPeriodEnd must be after creditingPeriodStart');\n  // VMR0015 caps crediting period at 7 years renewable (max 21) or 10 years fixed\n  var cpYears = (cpEnd - cpStart) / (365.25 * 86400000);\n  if (cpYears > 21.01)\n    throw new Error('ergate: crediting period exceeds VMR0015 maximum of 21 years (got '+cpYears.toFixed(2)+')');\n  if (monDate && (monDate < cpStart || monDate > cpEnd))\n    throw new Error('ergate: monitoringPeriodEnd ('+monPeriodEnd+') outside crediting period');\n\n  // \u2500\u2500 PHASE 6: Audit log \u2500\u2500\n  var auditLog = {\n    evaluatedAt: d.calcedAt || monPeriodEnd,\n    mode: 'STRICT_INSTITUTIONAL',\n    valStatus: valStatus, verStatus: verStatus,\n    valIssuer: valIssuer, verIssuer: verIssuer, vvbIndependent: vvbIndependenceEnforced, dryRunMode: dryRunMode,\n    microSafetyConfirmed: microConfirmed, microSafetyMethod: wq.microSafetyMethod, microSafetyDate: wq.microSafetyDate,\n    ocConfirmed: oc.ownerConfirmation, confirmedAmount: confAmt,\n    creditingPeriodStart: reg.creditingPeriodStart, creditingPeriodEnd: reg.creditingPeriodEnd,\n    monitoringPeriodEnd: monPeriodEnd,\n    ERy: ERy, vcu: vcu, buffer: buf, bufferPct: d.bufferPctApplied,\n    methodologyCompliance: 'AMS_III_AV_v9_0_VMR0015_v1_0_STRICT'\n  };\n\n  return Object.assign({}, d, {\n    gateClearedAtMonitoringPeriodEnd: monPeriodEnd,\n    gateClearedAt: monPeriodEnd || (d.calcedAt || new Date().toISOString()),\n    gateVerdict: dryRunMode ? 'PASS_DRYRUN_VVB_INDEPENDENCE_SKIPPED' : 'PASS_INSTITUTIONAL',\n    selfAttestMode: false,\n    dryRunMode: dryRunMode,\n    methodologyCompliance: dryRunMode ? 'AMS_III_AV_v9_0_VMR0015_v1_0_DRYRUN' : 'AMS_III_AV_v9_0_VMR0015_v1_0_STRICT',\n    modeAuditLog: auditLog\n  });\n}\nreturn gate();",
+                "outputSchema": "#4bb9c304-1bd0-49d7-81c8-ece542ae5a58",
+                "documentSigner": "owner",
+                "idType": "UUID",
+                "tag": "ergate",
+                "children": [],
+                "events": [
+                  {
+                    "target": "createvcutoken",
+                    "source": "ergate",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "f1234567-89ab-cdef-0123-456789abcde0",
+                "blockType": "createTokenBlock",
+                "defaultActive": false,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "onErrorAction": "no-action",
+                "uiMetaData": {
+                  "title": "Create VCU Token (auto)",
+                  "description": "Auto-create VCU-SDW token"
+                },
+                "template": "VCUToken",
+                "autorun": true,
+                "tag": "createvcutoken",
+                "events": [
+                  {
+                    "source": "createvcutoken",
+                    "target": "mintvcu",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ]
+              },
+              {
+                "id": "3cd8e3e6-0b08-4755-9987-adb71382ff2e",
+                "blockType": "mintDocumentBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint VCU-SDW Token",
+                  "description": "Mints the issuance share of VCU-SDW tokens. Rule = \"vcuQuantity\" (the gate-cleared computed value, two-decimal precision, fungible). Receives 95% of ERy after the 5% buffer-pool deduction"
+                },
+                "onErrorAction": "no-action",
+                "useTemplate": true,
+                "template": "VCUToken",
+                "rule": "vcuQuantity",
+                "accountType": "custom-value",
+                "accountId": "",
+                "tag": "mintvcu",
+                "children": [],
+                "events": [
+                  {
+                    "source": "mintvcu",
+                    "target": "createbuffertoken",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": [],
+                "accountIdValue": "0.0.8845724"
+              },
+              {
+                "id": "df028f82-27d7-4028-a48c-e470550d9eb2",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Confirmation",
+                  "description": "On successful mint, the Hedera token-mint transaction ID and the post-mint balance are written to the audit trail"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo104",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo105",
+                    "source": "mintinfo104",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "3ba183f4-4652-4e79-8fd3-d1d8c51e15ea",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Token Metadata",
+                  "description": "VCU-SDW: fungible, 2 decimals, admin/freeze/wipe enabled. Each token represents 1 tCO2e of verified emission reductions from this safe-drinking-water project"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo105",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo106",
+                    "source": "mintinfo105",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "22286811-79b5-4915-9c65-8384d26ce34a",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Vintage & Serial",
+                  "description": "Vintage year and serial-number range are stored in the issuance-metadata VC. Format: VCS-SDW-{vintage}-{idem8}-1-{vcu}"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo106",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo107",
+                    "source": "mintinfo106",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "ff9d7bf1-bf9c-4e96-8d4a-be6e5767bbea",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Buffer Pool",
+                  "description": "A separate VCU-SDW-BUFFER mint of 5% \u00d7 ERy executes in parallel. Buffer tokens are held in the registry buffer account and released only against documented permanence-loss events per VMR0015 \u00a76"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo107",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo108",
+                    "source": "mintinfo107",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "30e84f02-8232-41d8-b935-237ff034e85f",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Retirement",
+                  "description": "Retirement is full-amount only (no partial retire). Use the Retirement-Request supplementary VC; the gate enforces beneficiaryAmount = vcuQuantity \u00b1 0.001"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo108",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo109",
+                    "source": "mintinfo108",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "f7747e27-6bf2-4c18-9189-c290c14bdda9",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Idempotency",
+                  "description": "Each issuance carries a UUIDv4 idempotency key. Replays with the same key are rejected by the calcengine"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo109",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo110",
+                    "source": "mintinfo109",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "e34ac500-d037-4f01-93d0-13890684c1aa",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Audit Trail",
+                  "description": "The full audit trail (registration \u2192 water-quality \u2192 monitoring \u2192 telemetry \u2192 population \u2192 issuance metadata \u2192 calculation \u2192 gate \u2192 mint) is visible in the Public Audit Report tab"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo110",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo111",
+                    "source": "mintinfo110",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "58f1d725-5f22-47bf-bb85-25306e97dc4b",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Registry Reporting",
+                  "description": "The OWNER (Standard Registry) submits an aggregated quarterly report to Verra/CDM with VC IPFS CIDs and Hedera transaction IDs"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo111",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo112",
+                    "source": "mintinfo111",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "3e0d683a-8286-49cf-96af-0ba2b2886e38",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Cancellation",
+                  "description": "In case of post-issuance defects (fraud, double counting, methodology error), the OWNER may invoke wipe via the token admin key. Cancelled supply is reflected in the audit report"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo112",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo113",
+                    "source": "mintinfo112",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "d320d300-9ee3-41b6-932f-0fb07b6ff042",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Stage \u2014 Note 113",
+                  "description": "Reference to mint mechanics, vintage, serial range, retirement, and buffer-pool management. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo113",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo114",
+                    "source": "mintinfo113",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "84af4856-bbc0-4730-a89e-372bfcc341cf",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Stage \u2014 Note 114",
+                  "description": "Reference to mint mechanics, vintage, serial range, retirement, and buffer-pool management. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo114",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo115",
+                    "source": "mintinfo114",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "0b0180a0-a0df-4dce-90ac-cb5e9de20fbf",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Stage \u2014 Note 115",
+                  "description": "Reference to mint mechanics, vintage, serial range, retirement, and buffer-pool management. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo115",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo116",
+                    "source": "mintinfo115",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "7823370f-93ee-4390-b92c-6d9fe249316c",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Stage \u2014 Note 116",
+                  "description": "Reference to mint mechanics, vintage, serial range, retirement, and buffer-pool management. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo116",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo117",
+                    "source": "mintinfo116",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "efb1cb60-dfd7-4d4f-a8e3-28294332f7fd",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Stage \u2014 Note 117",
+                  "description": "Reference to mint mechanics, vintage, serial range, retirement, and buffer-pool management. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo117",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo118",
+                    "source": "mintinfo117",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "40295a64-f866-45a1-9c09-aa80a441e7ec",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Stage \u2014 Note 118",
+                  "description": "Reference to mint mechanics, vintage, serial range, retirement, and buffer-pool management. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo118",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo119",
+                    "source": "mintinfo118",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "112334b7-0ffc-47ef-94c5-b8068372de0d",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Stage \u2014 Note 119",
+                  "description": "Reference to mint mechanics, vintage, serial range, retirement, and buffer-pool management. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo119",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo120",
+                    "source": "mintinfo119",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "240dc17c-216f-493a-9a33-fcc37c5397d2",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Stage \u2014 Note 120",
+                  "description": "Reference to mint mechanics, vintage, serial range, retirement, and buffer-pool management. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo120",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo121",
+                    "source": "mintinfo120",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "62054d6e-d6dc-4c97-b208-d11634a0c996",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Stage \u2014 Note 121",
+                  "description": "Reference to mint mechanics, vintage, serial range, retirement, and buffer-pool management. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo121",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo122",
+                    "source": "mintinfo121",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "9854f4fb-402a-43d8-ade1-da820bb3df3d",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Stage \u2014 Note 122",
+                  "description": "Reference to mint mechanics, vintage, serial range, retirement, and buffer-pool management. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo122",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo123",
+                    "source": "mintinfo122",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "4f77a6cd-6321-4bf9-9b80-91cda310ebbf",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Stage \u2014 Note 123",
+                  "description": "Reference to mint mechanics, vintage, serial range, retirement, and buffer-pool management. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo123",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintinfo124",
+                    "source": "mintinfo123",
+                    "input": "",
+                    "output": "",
+                    "actor": "",
+                    "disabled": false
+                  }
+                ],
+                "artifacts": []
+              },
+              {
+                "id": "1556f664-e11a-4866-b48d-91f0198cd0c5",
+                "blockType": "informationBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint Stage \u2014 Note 124",
+                  "description": "Reference to mint mechanics, vintage, serial range, retirement, and buffer-pool management. See policy description for full methodology references and cross-check rules"
+                },
+                "onErrorAction": "no-action",
+                "tag": "mintinfo124",
+                "children": [],
+                "events": [],
+                "artifacts": []
+              },
+              {
+                "id": "f1234567-89ab-cdef-0123-456789abcde1",
+                "blockType": "createTokenBlock",
+                "defaultActive": false,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "onErrorAction": "no-action",
+                "uiMetaData": {
+                  "title": "Create Buffer Token (auto)",
+                  "description": "Auto-create VCU-SDW-BUFFER"
+                },
+                "template": "VCUBufferToken",
+                "autorun": true,
+                "tag": "createbuffertoken",
+                "events": [
+                  {
+                    "source": "createbuffertoken",
+                    "target": "mintbuffer",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": false
+                  }
+                ]
+              },
+              {
+                "id": "99df2405-f46d-4f67-9767-a73a7d590ba4",
+                "blockType": "mintDocumentBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Mint VCU-SDW-BUFFER (5% Buffer)",
+                  "description": "Mints the 5% buffer share of VCU-SDW-BUFFER tokens. Rule = \"bufferVcuQuantity\". Held in the registry-managed buffer account against permanence/reversal risk per VMR0015 \u00a76"
+                },
+                "onErrorAction": "no-action",
+                "useTemplate": true,
+                "template": "VCUBufferToken",
+                "rule": "bufferVcuQuantity",
+                "accountType": "custom-value",
+                "accountId": "",
+                "tag": "mintbuffer",
+                "children": [],
+                "events": [],
+                "artifacts": [],
+                "accountIdValue": "0.0.8845724"
+              },
+              {
+                "id": "9940e406-7bf6-4a5e-b83d-8fd7b6bc8947",
+                "blockType": "interfaceContainerBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "type": "blank",
+                  "title": "Retirement",
+                  "description": "OWNER-driven retirement workflow for issued VCU-SDW batches. Burns the holder's tokens and writes a retirement consensus message bound to a beneficiary"
+                },
+                "tag": "retirecontainer",
+                "children": [
+                  {
+                    "id": "4c695a9a-4c18-46fe-9e5e-bfe16f567eff",
+                    "blockType": "requestVcDocumentBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "STANDARD_REGISTRY",
+                      "PROJECTDEVELOPER",
+                      "OWNER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Retire VCU-SDW",
+                      "description": "OWNER initiates a retirement of an issued VCU-SDW batch on behalf of an end-buyer/beneficiary. The Retirement-Request VC carries beneficiaryName, beneficiaryAccount (Hedera 0.0.x), beneficiaryAmount (must equal the issued vcuQuantity for full retire), retirementReason, and retirementDate. The ergate has an optional retirement check that enforces beneficiaryAmount==vcuQuantity (no partial retire)",
+                      "type": "page"
+                    },
+                    "schema": "#a51367fa-9221-4b48-8d89-2d21495a08c3&1.1.5",
+                    "presetSchema": "",
+                    "preset": false,
+                    "presetFields": [],
+                    "presetMessage": "",
+                    "buttonContent": "Retire",
+                    "isMandatory": false,
+                    "type": "dialog",
+                    "idType": "UUID",
+                    "onErrorAction": "no-action",
+                    "editType": "new",
+                    "tag": "retirerequest",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "retiresend",
+                        "source": "retirerequest",
+                        "input": "RunEvent",
+                        "output": "RunEvent",
+                        "actor": "standard_registry",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "03a388a7-730d-407e-acf5-2e02cc9b3bcd",
+                    "blockType": "sendToGuardianBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "STANDARD_REGISTRY",
+                      "PROJECTDEVELOPER",
+                      "OWNER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Persist Retirement",
+                      "description": "Writes the Retirement-Request VC to the policy topic and emits a wipe/retirement consensus message"
+                    },
+                    "dataType": "vc-documents",
+                    "schema": "#a51367fa-9221-4b48-8d89-2d21495a08c3&1.1.5",
+                    "entityType": "Retirement-Request",
+                    "topic": "",
+                    "documentType": "vc",
+                    "tag": "retiresend",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "retireinfo",
+                        "source": "retiresend",
+                        "input": "RunEvent",
+                        "output": "RunEvent",
+                        "actor": "standard_registry",
+                        "disabled": false
+                      }
+                    ],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "7a2aec04-9c86-4148-9ac4-614378f7a737",
+                    "blockType": "informationBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "STANDARD_REGISTRY",
+                      "NO_ROLE",
+                      "OWNER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Retirement Recorded",
+                      "description": "The retirement consensus message has been written to topic 0.0.8838546. Beneficiary, amount, and serial-number range are now permanently associated with this batch and will appear on the Issuance Audit Trail report"
+                    },
+                    "tag": "retireinfo",
+                    "children": [],
+                    "events": [],
+                    "artifacts": []
+                  },
+                  {
+                    "id": "b9b55ff1-91ac-4b71-907a-d0cb9f50eb5a",
+                    "blockType": "tokenActionBlock",
+                    "defaultActive": true,
+                    "permissions": [
+                      "STANDARD_REGISTRY",
+                      "PROJECTDEVELOPER",
+                      "OWNER"
+                    ],
+                    "uiMetaData": {
+                      "title": "Lock Retired VCU-SDW (Freeze Holder)",
+                      "description": "Freezes the retired VCU-SDW in the holder's account. Tokens remain on chain but cannot be transferred. For a true on-chain burn (per Verra retirement-immutability), configure Guardian's external Retirement Contract in the Tokens UI and route the Retirement-Request VC through it after this freeze is applied. This pattern matches Verra-reference VM0033 architecture"
+                    },
+                    "action": "freeze",
+                    "template": "VCUToken",
+                    "accountType": "default",
+                    "accountId": "document.owner",
+                    "rule": "field3",
+                    "useTemplate": true,
+                    "tag": "retirewipe",
+                    "children": [],
+                    "events": [
+                      {
+                        "target": "retireinfo",
+                        "source": "retirewipe",
+                        "input": "RunEvent",
+                        "output": "RunEvent",
+                        "actor": "standard_registry",
+                        "disabled": true
+                      }
+                    ],
+                    "artifacts": [],
+                    "disabled": true
+                  }
+                ],
+                "events": [],
+                "artifacts": []
+              },
+              {
+                "id": "4ec8ca9f-9195-41bf-a7f6-2793af0724de",
+                "blockType": "tokenActionBlock",
+                "defaultActive": true,
+                "permissions": [
+                  "STANDARD_REGISTRY",
+                  "PROJECTDEVELOPER",
+                  "OWNER"
+                ],
+                "uiMetaData": {
+                  "title": "Grant KYC: VCU-SDW-BUFFER",
+                  "description": "Grants KYC on the buffer token to the registry-controlled buffer account. Required because the buffer token has enableKYC=true"
+                },
+                "action": "grantKyc",
+                "useTemplate": true,
+                "template": "VCUBufferToken",
+                "accountType": "default",
+                "accountId": "document.bufferAccountId",
+                "tag": "kycgrantbuffer",
+                "children": [],
+                "events": [
+                  {
+                    "target": "mintbuffer",
+                    "source": "kycgrantbuffer",
+                    "input": "RunEvent",
+                    "output": "RunEvent",
+                    "actor": "standard_registry",
+                    "disabled": true
+                  }
+                ],
+                "artifacts": [],
+                "disabled": true
+              }
+            ],
+            "events": [],
+            "artifacts": []
+          }
+        ],
+        "events": [],
+        "artifacts": []
+      },
+      {
+        "id": "ff7c23f5-310f-4191-abc1-0d621b3785f0",
+        "blockType": "tokenActionBlock",
+        "defaultActive": true,
+        "permissions": [
+          "STANDARD_REGISTRY",
+          "PROJECTDEVELOPER",
+          "OWNER"
+        ],
+        "uiMetaData": {
+          "title": "Emergency Freeze (Admin)",
+          "description": "Registry-only emergency control: freezes a target account from transferring VCU-SDW. Use only in case of detected fraud, sanctions, or governance dispute. All freeze actions are recorded on the policy topic for audit"
+        },
+        "action": "freeze",
+        "useTemplate": true,
+        "template": "VCUToken",
+        "accountType": "default",
+        "accountId": "document.owner",
+        "tag": "adminfreeze",
+        "children": [],
+        "events": [],
+        "artifacts": [],
+        "disabled": true
+      }
+    ],
+    "events": [],
+    "artifacts": [],
+    "policyTokens": [
+      {
+        "templateTokenTag": "VCUToken",
+        "tokenName": "VCU-SDW",
+        "tokenSymbol": "VCUSDW",
+        "tokenType": "fungible",
+        "decimals": "2",
+        "initialSupply": "0",
+        "enableAdmin": true,
+        "enableFreeze": false,
+        "enableKYC": false,
+        "enableWipe": true,
+        "changeSupply": true,
+        "draftToken": false,
+        "wipeContractId": ""
+      },
+      {
+        "templateTokenTag": "VCUBufferToken",
+        "tokenName": "VCU-SDW-BUFFER",
+        "tokenSymbol": "VCUBUF",
+        "tokenType": "fungible",
+        "decimals": "2",
+        "initialSupply": "0",
+        "enableAdmin": true,
+        "enableFreeze": false,
+        "enableKYC": false,
+        "enableWipe": true,
+        "changeSupply": true,
+        "draftToken": false,
+        "wipeContractId": ""
+      }
+    ]
+  }
+}
