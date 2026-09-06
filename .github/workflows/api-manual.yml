@@ -19,8 +19,8 @@ on:
         default: "smoke"
       sr_balance:
         type: number
-        description: INITIAL_STANDARD_REGISTRY_BALANCE in HBAR (max 500. 50 suggested for smoke, 500 for full e2e)
-        default: 50
+        description: INITIAL_STANDARD_REGISTRY_BALANCE in HBAR (max 5000. The run funds it out of a throwaway local account, so there is no reason to lower it)
+        default: 5000
 
 permissions:
   contents: read
@@ -35,7 +35,9 @@ jobs:
   buildAndTest:
     name: Build and test
     runs-on: guardian-linux-medium
-    timeout-minutes: 120
+    # The Solo deploy adds ~10 minutes of fixed cost and the contract compile + bytecode upload
+    # another ~3, on top of what the suite itself needs.
+    timeout-minutes: 180
     env:
       # .yarnrc.yml does not set enableGlobalCache and Yarn 4 defaults it to true,
       # which puts the cache in ~/.yarn/berry/cache. Forcing it off keeps the cache in
@@ -130,20 +132,24 @@ jobs:
         run: |
           set -euo pipefail
 
+          # HBAR is free on the local Hiero network this job provisions, so every trigger gets the
+          # same generous balance: 5000 is far above the point where a contract- or policy-heavy
+          # spec can hit INSUFFICIENT_PAYER_BALANCE.
           case "$EVENT" in
-            schedule)          TAGS="all";               BALANCE=500 ;;
-            push)              TAGS="smoke";             BALANCE=50  ;;
-            workflow_dispatch) TAGS="${IN_TAGS:-smoke}"; BALANCE="${IN_BALANCE:-50}" ;;
-            *)                 TAGS="${IN_TAGS:-smoke}"; BALANCE=50  ;;
+            schedule)          TAGS="all";               BALANCE=5000 ;;
+            push)              TAGS="smoke";             BALANCE=5000 ;;
+            workflow_dispatch) TAGS="${IN_TAGS:-smoke}"; BALANCE="${IN_BALANCE:-5000}" ;;
+            *)                 TAGS="${IN_TAGS:-smoke}"; BALANCE=5000 ;;
           esac
 
           # guardian-service hands this straight to Hedera's AccountCreateTransaction
           # (guardian-service/src/api/demo.service.ts:45) and neither it nor
-          # worker-service/src/api/helpers/hedera-sdk-helper.ts:894 imposes a maximum,
-          # so the ceiling has to be enforced here or a typo drains the CI operator
-          # account.
-          if ! [[ "$BALANCE" =~ ^[0-9]+$ ]] || (( BALANCE < 1 || BALANCE > 500 )); then
-            echo "::error::INITIAL_STANDARD_REGISTRY_BALANCE must be an integer between 1 and 500 (got '$BALANCE')"
+          # worker-service/src/api/helpers/hedera-sdk-helper.ts:894 imposes a maximum. The operator
+          # is a throwaway account the local network funds with 50,000,000 HBAR, so a typo no longer
+          # costs anything -- the check stays only to turn a malformed input into a readable error
+          # instead of a failure deep inside account creation.
+          if ! [[ "$BALANCE" =~ ^[0-9]+$ ]] || (( BALANCE < 1 || BALANCE > 5000 )); then
+            echo "::error::INITIAL_STANDARD_REGISTRY_BALANCE must be an integer between 1 and 5000 (got '$BALANCE')"
             exit 1
           fi
 
@@ -157,6 +163,102 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 1
+
+      # Solo runs the Hiero network on Kubernetes-in-Docker, which needs a usable Docker daemon and
+      # enough cgroup/mount access from inside this runner container. When that is missing, the
+      # failure surfaces minutes later in the middle of a Helm install, with an error that says
+      # nothing about the cause -- so prove it here instead.
+      #
+      # The node image is pinned to the one hiero-solo-action uses, so this check shares its pull
+      # with the real cluster rather than doubling it.
+      - name: Preflight the local Hiero network prerequisites
+        shell: bash
+        env:
+          KIND_VERSION: v0.29.0
+          KIND_NODE_IMAGE: kindest/node:v1.32.2@sha256:3966f21e12b760f6585bde7140cae5e8cdc0e52b37a6f90ce39834b6e72e3f49
+        run: |
+          set -euo pipefail
+          SUDO=""
+          [ "$(id -u)" -eq 0 ] || SUDO=sudo
+
+          if ! docker info >/dev/null 2>&1; then
+            echo "::error::Docker is not usable from this runner, so Solo cannot create its kind cluster"
+            exit 1
+          fi
+
+          if ! command -v kind >/dev/null 2>&1; then
+            $SUDO curl -fsSLo /usr/local/bin/kind \
+              "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64"
+            $SUDO chmod +x /usr/local/bin/kind
+          fi
+
+          trap 'kind delete cluster --name guardian-preflight >/dev/null 2>&1 || true' EXIT
+          if ! kind create cluster --name guardian-preflight --image "$KIND_NODE_IMAGE" --wait 120s; then
+            echo "::error::This runner cannot create a kind cluster, so the local Hiero network cannot be provisioned on it. Kubernetes-in-Docker needs a privileged Docker daemon and cgroup access from inside the runner container; see the kind output above."
+            exit 1
+          fi
+
+      # Replaces Hedera testnet: every account, topic, token and contract this run creates lives on
+      # a network that is thrown away with the job.
+      #
+      # The ports are not free choices. Guardian's built-in `localnode` branch hardcodes the
+      # consensus node on :50211 as account 0.0.3, the mirror node gRPC on :5600 and the mirror node
+      # REST API on :5551 (common/src/hedera-modules/environment.ts:168,231,232). The
+      # OVERRIDE_HEDERA_* variables cannot be used to move them: only guardian-service and
+      # policy-service read those, while topic-listener-service goes straight to HEDERA_NET +
+      # LOCALNODE_* -- so aligning the ports is what keeps the whole stack on one network.
+      #
+      # nodeVersion is pinned to ours so the action's own setup-node resolves to the same Node
+      # install, and the globally installed `solo`/`kubectl` stay on PATH afterwards.
+      - name: Start local Hiero network
+        id: hedera
+        uses: hiero-ledger/hiero-solo-action@6a79c9451fc1b26a98536facc3b988ab122ffbc8 # v0.24.0
+        with:
+          installMirrorNode: true
+          installRelay: false        # Guardian never uses the JSON-RPC relay
+          installBlockNode: false
+          dualMode: false
+          nodeVersion: ${{ env.NODE_VERSION }}
+          haproxyPort: 50211
+          mirrorNodePortRest: 5551
+          mirrorNodePortGrpc: 5600
+          hbarAmount: 50000000
+
+      # The forwards the action leaves behind are plain backgrounded `kubectl port-forward`
+      # processes (see its action.yml), and a full `all-no-mgs` run lasts hours. One dropped
+      # forward takes the entire Guardian stack off the network, so they are re-established here
+      # rather than assumed to survive. Deliberately not `solo deployment refresh port-forwards`:
+      # solo only tracks the forwards it started itself, and these are not among them.
+      - name: Supervise the Solo port forwards
+        shell: bash
+        run: |
+          set -euo pipefail
+          watchdog="${RUNNER_TEMP}/solo-port-forward-watchdog.sh"
+          cat > "$watchdog" <<'WATCHDOG'
+          #!/usr/bin/env bash
+          set -uo pipefail
+          NAMESPACE=solo
+          # local port -> "<service> <remote port>", matching hiero-solo-action's own forwards
+          declare -A FORWARDS=(
+            [50211]="svc/haproxy-node1-svc 50211"
+            [5551]="svc/mirror-1-rest 80"
+            [5600]="svc/mirror-1-grpc 5600"
+          )
+          while true; do
+            for local_port in "${!FORWARDS[@]}"; do
+              read -r service remote_port <<< "${FORWARDS[$local_port]}"
+              if ! (exec 3<>"/dev/tcp/127.0.0.1/${local_port}") 2>/dev/null; then
+                echo "$(date -Is) :${local_port} is not answering, restarting the forward to ${service}"
+                kubectl port-forward "$service" -n "$NAMESPACE" "${local_port}:${remote_port}" &
+              fi
+            done
+            sleep 15
+          done
+          WATCHDOG
+          chmod +x "$watchdog"
+          nohup "$watchdog" > "${RUNNER_TEMP}/solo-port-forward-watchdog.log" 2>&1 &
+          echo "$!" > "${RUNNER_TEMP}/solo-port-forward-watchdog.pid"
+          echo "port-forward watchdog started (pid $!)"
 
       # `cache:` is deliberately not set. It accepts a single package manager (so npm
       # and yarn cannot both be enabled), and for Yarn Berry it shells out to
@@ -291,6 +393,56 @@ jobs:
           timeout 180 bash -c 'until curl -fsS --max-time 5 http://127.0.0.1:8080/ipfs/bafkqaaa >/dev/null; do sleep 2; done' \
             || { echo "::error::IPFS gateway (:8080) is not answering"; exit 1; }
 
+          # The local Hiero network, reached through the Solo port forwards. Same reasoning as
+          # above: the pods being healthy inside kind proves nothing about the forward.
+          wait_tcp 127.0.0.1 50211 "Hiero consensus node"
+          wait_tcp 127.0.0.1 5600  "Hiero mirror node gRPC"
+
+          echo "Checking the Hiero mirror node REST API on :5551 ..."
+          timeout 300 bash -c 'until curl -fsS --max-time 5 http://127.0.0.1:5551/api/v1/accounts >/dev/null; do sleep 2; done' \
+            || { echo "::error::Hiero mirror node REST API (:5551) is not answering; Guardian resolves every message through it"; exit 1; }
+
+      # guardian-service deploys the retire/wipe contracts from Hedera File IDs
+      # (guardian-service/src/api/helpers/contract-api.ts:133-179), and the ones pinned in
+      # guardian-service/configs/.env.guardian are testnet files that do not exist on a network
+      # created minutes ago. They are rebuilt here, which as a side effect ends the drift described
+      # in e2e-tests/pending-issues/contract-bytecode-must-match-the-service-abi.md: the bytecode
+      # now comes from the same commit as the event ABIs that decode its logs.
+      - name: Load contract build cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            contracts/node_modules
+            contracts/artifacts
+            contracts/cache
+          key: ${{ runner.os }}-contracts-${{ hashFiles('contracts/package.json') }}-${{ hashFiles('contracts/src/**') }}
+          restore-keys: ${{ runner.os }}-contracts-${{ hashFiles('contracts/package.json') }}-
+
+      - name: Compile contracts
+        working-directory: contracts
+        env:
+          # `compile` never connects anywhere -- hardhat.config.ts sets defaultNetwork: 'hardhat' --
+          # but Hardhat validates *every* declared network at config load, and all four of the
+          # remote ones take their `url` from RPC_URL. Leaving it unset fails with
+          # "HH8: Invalid value undefined for HardhatConfig.networks.local.url" before compilation
+          # even starts, so any syntactically valid URL will do here.
+          RPC_URL: http://localhost:7546
+        run: |
+          set -euo pipefail
+          # `contracts` is not a Yarn workspace and ships no package-lock.json, so `npm ci` is not
+          # an option.
+          npm install --no-audit --fund=false
+          npx hardhat compile
+
+      - name: Upload contract bytecode to the local Hiero network
+        id: bytecode
+        env:
+          HEDERA_NET: localnode
+          LOCALNODE_ADDRESS: 127.0.0.1
+          OPERATOR_ID: ${{ steps.hedera.outputs.accountId }}
+          OPERATOR_KEY: ${{ steps.hedera.outputs.privateKey }}
+        run: node .github/scripts/upload-contract-bytecode.mjs
+
       # No `sleep` anywhere: each tier waits until its services have actually opened
       # their named NATS connection, and every process gets its own log file so a boot
       # failure is diagnosable after the fact.
@@ -302,8 +454,24 @@ jobs:
           GUARDIAN_LOG_DIR: ${{ runner.temp }}/guardian-logs
           CI: true
           NODE_OPTIONS: "--openssl-legacy-provider"
-          OPERATOR_ID: ${{ secrets.CI_HEDERA_ACCOUNT }}
-          OPERATOR_KEY: ${{ secrets.CI_HEDERA_PRIV_KEY }}
+          # "localnode", not "local-node": Environment.setNetwork throws on any other spelling.
+          HEDERA_NET: localnode
+          # Kept equal to HEDERA_NET so the database name stays plain `guardian_db`
+          # (common/src/helpers/db-helper.ts:46).
+          PREUSED_HEDERA_NET: localnode
+          LOCALNODE_ADDRESS: 127.0.0.1
+          LOCALNODE_PROTOCOL: http
+          # Load-bearing: each service loads its config with dotenv.config({ path }), which skips
+          # keys already *present* in process.env -- and an empty `env:` value here is present. So
+          # this genuinely suppresses the testnet 0.0.1960 pinned in .env.guardian, and the topic
+          # gets created on the fresh network instead.
+          INITIALIZATION_TOPIC_ID: ""
+          OPERATOR_ID: ${{ steps.hedera.outputs.accountId }}
+          OPERATOR_KEY: ${{ steps.hedera.outputs.privateKey }}
+          WIPE_CONTRACT_FILE_ID: ${{ steps.bytecode.outputs.wipe }}
+          RETIRE_CONTRACT_FILE_ID: ${{ steps.bytecode.outputs.retire }}
+          RETIRE_SINGLE_FILE_ID: ${{ steps.bytecode.outputs.retireSingle }}
+          RETIRE_DOUBLE_FILE_ID: ${{ steps.bytecode.outputs.retireDouble }}
           JWT_PRIVATE_KEY: ${{ secrets.CI_JWT_PRIVATE_KEY }}
           JWT_PUBLIC_KEY: ${{ secrets.CI_JWT_PUBLIC_KEY }}
           SERVICE_JWT_PUBLIC_KEY_ALL: ${{ secrets.CI_JWT_PUBLIC_KEY }}
@@ -313,7 +481,7 @@ jobs:
           IPFS_PUBLIC_GATEWAY: http://127.0.0.1:8080/ipfs/{cid}
           IPFS_TIMEOUT: 720
           ACCESS_TOKEN_UPDATE_INTERVAL: 600000
-          INITIAL_BALANCE: 20
+          INITIAL_BALANCE: 100
           INITIAL_STANDARD_REGISTRY_BALANCE: ${{ steps.params.outputs.sr_balance }}
         run: |
           set -euo pipefail
@@ -365,8 +533,11 @@ jobs:
           CYPRESS_BROWSER: electron
           # /dev/shm is 64 MB in this container, well under what Chromium expects
           ELECTRON_EXTRA_LAUNCH_ARGS: --disable-dev-shm-usage
-          CYPRESS_operatorId: ${{ secrets.CI_HEDERA_ACCOUNT }}
-          CYPRESS_operatorKey: ${{ secrets.CI_HEDERA_PRIV_KEY }}
+          CYPRESS_operatorId: ${{ steps.hedera.outputs.accountId }}
+          CYPRESS_operatorKey: ${{ steps.hedera.outputs.privateKey }}
+          # Makes the suite seed its own Hedera artefacts instead of importing the testnet messages
+          # pinned in cypress.env.json, which do not exist here.
+          CYPRESS_hederaNet: localnode
           CYPRESS_ipfsStorageApiKey: ${{ secrets.IPFS_STORAGE_API_KEY }}
           CYPRESS_MGSAdmin: ${{ secrets.MGS_TENANT_NAME }}
           CYPRESS_MGSIndexerAPIToken: ${{ secrets.MGSIndexerAPIToken }}
@@ -426,7 +597,7 @@ jobs:
           TAGS: ${{ steps.params.outputs.tags }}
           SR_BALANCE: ${{ steps.params.outputs.sr_balance }}
           REPORT_NAME: ${{ steps.params.outputs.report_name }}
-          INITIAL_BALANCE: 20
+          INITIAL_BALANCE: 100
           IPFS_TIMEOUT: 720
           ACCESS_TOKEN_UPDATE_INTERVAL: 600000
           # Everything below goes through env rather than being interpolated into the
@@ -438,6 +609,8 @@ jobs:
           ACTOR: ${{ github.actor }}
           RUNNER_LABEL: ${{ runner.name }}
           RUNNER_PLATFORM: ${{ runner.os }}/${{ runner.arch }}
+          HEDERA_OPERATOR_ID: ${{ steps.hedera.outputs.accountId }}
+          SOLO_DEPLOYMENT: ${{ steps.hedera.outputs.deployment }}
         if: always()
         run: |
           set -euo pipefail
@@ -454,6 +627,8 @@ jobs:
             echo "| Ref | \`${REF_NAME}\` |"
             echo "| Commit | \`${COMMIT_SHA}\` |"
             echo "| CYPRESS_grepTags | \`${TAGS}\` |"
+            echo "| HEDERA_NET | \`localnode\` (Solo deployment \`${SOLO_DEPLOYMENT}\`) |"
+            echo "| Hedera operator | \`${HEDERA_OPERATOR_ID}\` |"
             echo "| INITIAL_STANDARD_REGISTRY_BALANCE | \`${SR_BALANCE}\` |"
             echo "| INITIAL_BALANCE | \`${INITIAL_BALANCE}\` |"
             echo "| MIN_PASSWORD_LENGTH | \`${MIN_PASSWORD_LENGTH}\` |"
@@ -500,3 +675,44 @@ jobs:
           path: ${{ runner.temp }}/guardian-logs/
           if-no-files-found: ignore
           retention-days: 14
+
+      # Collected before the teardown below deletes the cluster. Uploaded on every run, not only on
+      # failure: a Hedera-side problem usually shows up as a Guardian timeout, and these logs are
+      # the only place the network's own version of events is recorded.
+      - name: Collect local Hiero network diagnostics
+        if: always()
+        shell: bash
+        run: |
+          set -uo pipefail
+          dest="${RUNNER_TEMP}/solo-logs"
+          mkdir -p "$dest"
+          cp -r "${HOME}/.solo/logs/." "$dest/" 2>/dev/null || true
+          cp "${RUNNER_TEMP}/solo-port-forward-watchdog.log" "$dest/" 2>/dev/null || true
+          kubectl get pods -n solo -o wide > "$dest/pods.txt" 2>&1 || true
+          kubectl get svc -n solo -o wide > "$dest/services.txt" 2>&1 || true
+
+      - name: Upload local Hiero network logs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: solo-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/solo-logs/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      # Everything Solo created lives inside the kind cluster, so deleting the cluster is the whole
+      # teardown -- it is also exactly what hiero-solo-action does before it deploys. The runner is
+      # a long-lived self-hosted container, so leaving the cluster behind would leak a Kubernetes
+      # node and the :50211/:5551/:5600 bindings the next run needs.
+      - name: Destroy the local Hiero network
+        if: always()
+        shell: bash
+        run: |
+          set -uo pipefail
+          pidfile="${RUNNER_TEMP}/solo-port-forward-watchdog.pid"
+          if [ -f "$pidfile" ]; then
+            kill "$(cat "$pidfile")" 2>/dev/null || true
+          fi
+          pkill -f 'kubectl port-forward' || true
+          kind delete cluster --name solo-e2e || true
+          rm -rf "${HOME}/.solo"

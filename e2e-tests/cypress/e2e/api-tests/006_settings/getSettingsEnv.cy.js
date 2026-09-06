@@ -15,7 +15,9 @@ context('Settings', { tags: ['settings', 'thirdPool', 'all', 'all-no-mgs'] }, ()
                 },
             }).then((response) => {
                 expect(response.status).eql(STATUS_CODE.OK);
-                expect(response.body).eql('testnet');
+                // The endpoint reports Environment.network, i.e. the network Guardian is configured
+                // for -- which is the network the suite was pointed at.
+                expect(response.body).eql(Cypress.env('hederaNet'));
             });
         });
     })

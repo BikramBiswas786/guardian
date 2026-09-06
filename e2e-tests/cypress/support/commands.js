@@ -28,7 +28,7 @@ import { METHOD, STATUS_CODE } from './api/api-const';
 import API from './ApiUrls';
 import { randomInt } from './random';
 import * as Authorization from './authorization';
-import { importPolicyFromMessage } from './CustomHelpers/ipfsSeeding';
+import { importPolicyFromMessage, seededMessageId } from './CustomHelpers/ipfsSeeding';
 
 Cypress.Commands.add('checkIfFileExistByPartialName', (partialName) => {
     cy.task('checkFile', partialName).then(fileExists => {
@@ -397,7 +397,8 @@ Cypress.Commands.add('getOrCreateIRec4Policy', (username, { publish: shouldPubli
             if (existing) {
                 return publish(authorization, existing);
             }
-            return importPolicyFromMessage(username, Cypress.env('policy_for_compare1'))
+            return seededMessageId('policy_for_compare1')
+                .then((messageId) => importPolicyFromMessage(username, messageId))
                 .then(() => findPolicy(authorization))
                 .then((imported) => {
                     expect(imported, `${policyName} after importing it from its message`).to.not.be.null;
