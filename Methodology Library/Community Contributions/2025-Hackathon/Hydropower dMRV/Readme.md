@@ -69,7 +69,9 @@ Multi-role governance following the standard VM0047 pattern: Project Proponent s
 
 ## Files
 
-- **Policy file:** [VMR0017 Grid-Connected Renewable Electricity Generation (ACM0002 Revision, incl. Hydropower).policy](https://github.com/BikramBiswas786/Hedera-hydropower-dMRV-with-5-layer-verification-/blob/main/Apex%20Hackathon26/VMR0017%20Grid-Connected%20Renewable%20Electricity%20Generation%20(ACM0002%20Revision%2C%20incl.%20Hydropower)_1785008700176_1785009452793_1785180341990_1786834536231_1786908281195_1786957864810_1786970853091_1786992168711_178%20(3).policy)
+- **Policy file:** [VMR0017 Grid-Connected Renewable Electricity Generation (ACM0002 Revision, incl. Hydropower).policy](
+
+https://github.com/BikramBiswas786/guardian/blob/patch-4/Methodology%20Library/Community%20Contributions/2025-Hackathon/Hydropower%20dMRV/VMR0017%20Grid-Connected%20Renewable%20Electricity%20Generation%20(ACM0002%20Revision%2C%20incl.%20Hydropower).policy 
 - **Schema mapping (Excel):** [policy_1787055470479.xlsx](https://github.com/BikramBiswas786/Hedera-hydropower-dMRV-with-5-layer-verification-/blob/main/Apex%20Hackathon26/policy_1787055470479.xlsx)
 
 ---
