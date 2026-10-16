@@ -1,0 +1,51 @@
+name: mirror balance parser
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [advisory-recheck]
+    paths:
+      - "security-research/mirror-node/**"
+      - ".github/workflows/mirror-balance-parser.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  parser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: guardian
+      - uses: actions/checkout@v4
+        with:
+          repository: hiero-ledger/hiero-mirror-node
+          ref: 8c354af83d73a848867ee23ba84cab3902b6daff
+          path: mn
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Install evidence test
+        run: python3 guardian/security-research/mirror-node/install.py mn
+      - name: Run parser test
+        working-directory: mn
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          ./gradlew :importer:test --tests "*BalanceParserIntTruncationTest" --console=plain 2>&1 | tee "$GITHUB_WORKSPACE/gradle.log"
+      - name: Summarise
+        if: always()
+        run: |
+          grep -E 'BUILD (SUCCESSFUL|FAILED)' gradle.log | tail -1 | sed 's/^/::notice title=gradle::/' || true
+          grep -E '\.java:[0-9]+: error:' gradle.log | head -6 | while IFS= read -r l; do echo "::error title=compile::$l"; done || true
+          d=mn/importer/build/test-results/test
+          for f in "$d"/*BalanceParserIntTruncationTest*.xml; do
+            [ -f "$f" ] || continue
+            echo "::notice title=suite::$(grep -o '<testsuite [^>]*>' "$f" | grep -oE '(tests|skipped|failures|errors)="[^"]*"' | tr '\n' ' ')"
+            grep -o '<testcase name="[^"]*"' "$f" | sed 's/<testcase //' | while IFS= read -r l; do echo "::notice title=case::$l"; done
+            grep -o '<failure message="[^"]\{0,300\}' "$f" | head -4 | while IFS= read -r l; do echo "::error title=failure::$l"; done
+          done
+          [ -d "$d" ] || echo "::error title=no-results::no test results (build may have failed early)"
