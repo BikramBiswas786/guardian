@@ -1,0 +1,66 @@
+name: fee exemption harness
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [advisory-recheck]
+    paths:
+      - "security-research/fee-exemption-harness/**"
+      - ".github/workflows/fee-exemption-harness.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  exemption:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: ["0xE7E111", "0x5EED1234"]
+    env:
+      EXEMPT_ITERATIONS: "500000"
+      EXEMPT_SEED: ${{ matrix.seed }}
+    name: exemption (${{ matrix.seed }})
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: guardian
+
+      - uses: actions/checkout@v4
+        with:
+          repository: hiero-ledger/hiero-consensus-node
+          ref: a00481bcf7739f527df6375faf15fb1b3969bd83
+          path: hcn
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Install harness
+        run: python3 guardian/security-research/fee-exemption-harness/install.py hcn
+
+      - name: Run tests
+        working-directory: hcn
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          ./gradlew :app-service-token-impl:test \
+            --tests "*FeeExemptionConservationPropertyTest" \
+            --continue --console=plain 2>&1 | tee "$GITHUB_WORKSPACE/gradle.log"
+
+      - name: Summarise
+        if: always()
+        run: |
+          grep -E 'BUILD (SUCCESSFUL|FAILED)' gradle.log | tail -1 | sed 's/^/::notice title=gradle::/' || true
+          grep -E '\.java:[0-9]+: error:' gradle.log | head -4 | while IFS= read -r l; do echo "::error title=compile::$l"; done || true
+          d=hcn/hedera-node/hedera-token-service-impl/build/test-results/test
+          for f in "$d"/*FeeExemptionConservationPropertyTest*.xml; do
+            [ -f "$f" ] || continue
+            echo "::notice title=suite::$(grep -o '<testsuite [^>]*>' "$f" | grep -oE '(tests|skipped|failures|errors)="[^"]*"' | tr '\n' ' ')"
+            grep -oE '\[[a-z-]+\] conservation held[^<]*|CONSERVATION BREAK[^<]*|EXEMPT PAYER DEBITED[^<]*|VACUOUS[^<]*|UNEXPECTED[^<]*' "$f" | head -10 | while IFS= read -r l; do echo "::notice title=result::$l"; done
+            grep -o '<failure message="[^"]\{0,500\}' "$f" | head -6 | while IFS= read -r l; do echo "::error title=failure::$l"; done
+          done
+          [ -d "$d" ] || echo "::error title=no-results::test-results directory missing"
