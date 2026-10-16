@@ -28,6 +28,7 @@ jobs:
     env:
       CONSERVATION_ITERATIONS: "1000000"
       CONSERVATION_MULTILEVEL_ITERATIONS: "200000"
+      ALLOWANCE_ITERATIONS: "300000"
       CONSERVATION_SEED: ${{ matrix.seed }}
     steps:
       - uses: actions/checkout@v4
@@ -60,6 +61,7 @@ jobs:
             --tests "*CustomFeeConservationPropertyTest" \
             --tests "*CustomFeeAssessmentStepTest" \
             --tests "*HookAuthorizationPropertyTest" \
+            --tests "*AllowanceSpendPropertyTest" \
             --console=plain 2>&1 | tee "$GITHUB_WORKSPACE/gradle.log"
 
       # GitHub keeps at most 10 notice annotations per step, so results are split across steps.
@@ -69,7 +71,7 @@ jobs:
           d=hcn/hedera-node/hedera-token-service-impl/build/test-results/test
           grep -E 'BUILD (SUCCESSFUL|FAILED)' gradle.log | tail -1 | sed 's/^/::notice title=gradle::/' || true
           grep -E 'error:' gradle.log | head -5 | while IFS= read -r l; do echo "::error title=compile::$l"; done || true
-          for f in "$d"/*Conservation*.xml "$d"/*CustomFeeAssessmentStepTest*.xml "$d"/*HookAuthorization*.xml; do
+          for f in "$d"/*Conservation*.xml "$d"/*CustomFeeAssessmentStepTest*.xml "$d"/*HookAuthorization*.xml "$d"/*AllowanceSpend*.xml; do
             [ -f "$f" ] || continue
             echo "::notice title=suite::$(grep -o '<testsuite [^>]*>' "$f" | grep -oE '(name|tests|skipped|failures|errors)="[^"]*"' | head -5 | tr '\n' ' ')"
             grep -o '<failure message="[^"]\{0,600\}' "$f" | head -5 | while IFS= read -r l; do echo "::error title=failure::$l"; done
@@ -89,9 +91,9 @@ jobs:
         if: always()
         run: |
           d=hcn/hedera-node/hedera-token-service-impl/build/test-results/test
-          for f in "$d"/*HookAuthorization*.xml; do
+          for f in "$d"/*HookAuthorization*.xml "$d"/*AllowanceSpend*.xml; do
             [ -f "$f" ] || continue
-            grep -oE '\[hook-[a-z]+\][^<]*|HOOK (AUTHORIZATION|GATE) VIOLATION[^<"]*' "$f" | head -8 | while IFS= read -r l; do echo "::notice title=hooks::$l"; done
+            grep -oE '\[(hook|allowance)-[a-z]+\][^<"]*|HOOK (AUTHORIZATION|GATE) VIOLATION[^<"]*' "$f" | head -8 | while IFS= read -r l; do echo "::notice title=hooks::$l"; done
           done
 
       - name: Upload reports

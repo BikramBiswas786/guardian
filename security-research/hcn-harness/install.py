@@ -22,4 +22,6 @@ target.write_text(src)
 hooks_pkg = pkg / "hooks"
 hooks_pkg.mkdir(exist_ok=True)
 shutil.copy(here / "HookAuthorizationPropertyTest.java", hooks_pkg / "HookAuthorizationPropertyTest.java")
+# 4. Allowance-spend differential tests for the hbar and fungible-token adjust steps.
+shutil.copy(here / "AllowanceSpendPropertyTest.java", pkg / "AllowanceSpendPropertyTest.java")
 print("installed into", hcn)
