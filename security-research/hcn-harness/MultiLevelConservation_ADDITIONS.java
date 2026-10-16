@@ -125,8 +125,16 @@
         final int iterations = Integer.decode(multiLevelCfg(
                 "conservation.multilevel.iterations", "CONSERVATION_MULTILEVEL_ITERATIONS", "3000"));
         final long masterSeed = Long.decode(multiLevelCfg("conservation.seed", "CONSERVATION_SEED", "0xC0FFEE"));
-        givenTxn();
-        final var replacedOp = getReplacedOp();
+        // Reuse the op setUp() already built: calling getReplacedOp() again re-runs alias resolution against stores
+        // that setUp() already mutated, which fails with ACCOUNT_REPEATED_IN_ACCOUNT_AMOUNTS before any assessment.
+        final CryptoTransferTransactionBody replacedOp;
+        try {
+            final var opField = CustomFeeAssessmentStep.class.getDeclaredField("op");
+            opField.setAccessible(true);
+            replacedOp = (CryptoTransferTransactionBody) opField.get(subject);
+        } catch (final ReflectiveOperationException e) {
+            throw new AssertionError("Cannot read the op prepared by setUp()", e);
+        }
         final var rng = new java.util.Random(masterSeed);
         int accepted = 0;
         int rejected = 0;
