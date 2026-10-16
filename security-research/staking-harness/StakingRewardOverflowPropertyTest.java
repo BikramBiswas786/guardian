@@ -137,11 +137,12 @@ class StakingRewardOverflowPropertyTest {
     }
 
     @Test
-    void overflowThresholdIsFarBeyondTotalSupply() {
-        // Allow stake up to 200x total supply to locate where long overflow begins; assert it is beyond supply,
-        // i.e. not attacker-reachable. (Does not assert match; this range intentionally includes the overflow.)
-        final long mism = runRange("extreme", TOTAL_SUPPLY_TINYBARS * 200, DEFAULT_PER_HBAR_RATE, false);
-        // Sanity: the extreme range should exercise the overflow at least occasionally (otherwise the probe is vacuous).
-        assertThat(mism).withFailMessage("extreme range never overflowed; probe may be miscalibrated").isPositive();
+    void noOverflowForAnyRepresentableStakeAtDefaultRate() {
+        // Stronger statement: totalStake is a long (<= ~9.2e18). At the default rate the cumulative reward-sum delta
+        // over <=365 periods is <= ~2.5e6, and (Long.MAX/1e8)*2.5e6 ~= 2.3e17 << Long.MAX -- ~40x headroom. So the
+        // long arithmetic cannot overflow for ANY representable stake. Exercise stake up to Long.MAX/2 (a bound that
+        // does not itself overflow) and assert the real calc still matches exact BigInteger everywhere.
+        final long mism = runRange("full-range", Long.MAX_VALUE / 2, DEFAULT_PER_HBAR_RATE, true);
+        assertThat(mism).withFailMessage("unexpected overflow within representable stake range").isZero();
     }
 }
