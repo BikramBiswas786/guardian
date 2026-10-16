@@ -1,0 +1,81 @@
+name: advisory recheck
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [advisory-recheck]
+    paths:
+      - "security-research/advisory-recheck/**"
+      - ".github/workflows/advisory-recheck.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  recheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mode: q776-baseline
+            tests: --tests "*UpdateKeysDecoderTest" --tests "*UpdateKeysDecoder16cTest"
+          - mode: q776-fix
+            tests: --tests "*UpdateKeysDecoderTest" --tests "*UpdateKeysDecoder16cTest" --tests "*.hts.update.*"
+          - mode: jfxq-baseline
+            tests: --tests "*InvalidSignatureConsistencyTest"
+          - mode: jfxq-fix
+            tests: ""
+    name: recheck (${{ matrix.mode }})
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: guardian
+
+      - uses: actions/checkout@v4
+        with:
+          repository: hiero-ledger/hiero-consensus-node
+          ref: a00481bcf7739f527df6375faf15fb1b3969bd83
+          path: hcn
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Apply ${{ matrix.mode }}
+        run: python3 guardian/security-research/advisory-recheck/apply.py hcn ${{ matrix.mode }}
+
+      - name: Run tests
+        working-directory: hcn
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          ./gradlew :app-service-contract-impl:test ${{ matrix.tests }} --continue --console=plain 2>&1 | tee "$GITHUB_WORKSPACE/gradle.log"
+
+      - name: Summarise
+        if: always()
+        run: |
+          grep -E 'BUILD (SUCCESSFUL|FAILED)' gradle.log | tail -1 | sed 's/^/::notice title=gradle::/' || true
+          grep -E '\.java:[0-9]+: error:' gradle.log | head -4 | while IFS= read -r l; do echo "::error title=compile::$l"; done || true
+          python3 - <<'EOF'
+          import glob, xml.etree.ElementTree as ET
+          d = "hcn/hedera-node/hedera-smart-contract-service-impl/build/test-results/test/"
+          tot = fail = skip = 0; failed = []; mine = []
+          for f in glob.glob(d + "*.xml"):
+              r = ET.parse(f).getroot()
+              tot += int(r.get("tests", 0)); skip += int(r.get("skipped", 0))
+              cls = r.get("name").rsplit(".", 1)[-1]
+              for tc in r.iter("testcase"):
+                  bad = tc.find("failure") is not None or tc.find("error") is not None
+                  if bad:
+                      fail += 1; failed.append(f"{cls}.{tc.get('name')}")
+                  if cls in ("UpdateKeysDecoderTest", "UpdateKeysDecoder16cTest", "InvalidSignatureConsistencyTest"):
+                      mine.append(f"{'FAIL' if bad else 'pass'} {cls}.{tc.get('name')}")
+          print(f"::notice title=totals::tests={tot} failed={fail} skipped={skip}")
+          for chunk in range(0, len(mine), 8):
+              print("::notice title=advisory-tests::" + " | ".join(sorted(mine)[chunk:chunk + 8]))
+          if failed:
+              print("::warning title=all-failures::" + " | ".join(sorted(failed)[:40]) + (f" | ...+{len(failed)-40}" if len(failed) > 40 else ""))
+          EOF
