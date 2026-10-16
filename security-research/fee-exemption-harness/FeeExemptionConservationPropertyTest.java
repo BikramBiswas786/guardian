@@ -63,7 +63,10 @@ public class FeeExemptionConservationPropertyTest {
     private final TokenID feeTokenId = asToken(3000);
     private final TokenID payTokenId = asToken(3001);
     private final AccountID treasury = asAccount(0L, 0L, 7777);
-    private final AccountID receiver = asAccount(0L, 0L, 5001);
+    // Seed accounts carry the net-zero baseline transfer; they are never a candidate payer, so the payer
+    // starts at 0 on feeTokenId and ANY debit observed on the payer is purely a fee the assessor added.
+    private final AccountID seedSrc = asAccount(0L, 0L, 9001);
+    private final AccountID seedDst = asAccount(0L, 0L, 9002);
     // Candidate payers: treasury, the two fee collectors, and a plain stranger.
     private final AccountID collector1 = asAccount(0L, 0L, 6001);
     private final AccountID collector2 = asAccount(0L, 0L, 6002);
@@ -189,16 +192,22 @@ public class FeeExemptionConservationPropertyTest {
                         .withFailMessage("CONSERVATION BREAK [%s] token=%s net=%d seed=%d %s", name, tok, net, seed, c.desc())
                         .isZero();
             }
-            // (2) exemption fidelity: an exempt payer must not be newly debited below its seeded balance
+            // (2) exemption fidelity: payer starts at 0 on feeTokenId, so any negative is a fee the assessor added.
             final long payerNet = valueOf(c.result().getMutableInputBalanceAdjustments().get(feeTokenId), c.payer());
             if (!c.feeExpected()) {
                 assertThat(payerNet)
                         .withFailMessage(
-                                "EXEMPT PAYER DEBITED [%s] payer=%s net=%d (policy says exempt; expected no debit) seed=%d %s",
+                                "EXEMPT PAYER DEBITED [%s] payer=%s net=%d (policy says exempt; expected 0) seed=%d %s",
                                 name, c.payer(), payerNet, seed, c.desc())
-                        .isGreaterThanOrEqualTo(0L);
+                        .isZero();
                 exemptHonored++;
             } else {
+                // A chargeable case must actually debit the payer, or the "charged" branch is vacuous.
+                assertThat(payerNet)
+                        .withFailMessage(
+                                "EXPECTED CHARGE MISSING [%s] payer=%s net=%d (policy says chargeable) seed=%d %s",
+                                name, c.payer(), payerNet, seed, c.desc())
+                        .isNegative();
                 charged++;
             }
             checked++;
@@ -250,12 +259,13 @@ public class FeeExemptionConservationPropertyTest {
                 .build();
     }
 
-    /** Seed a net-zero transfer of feeTokenId from the payer, so the result has a mutable map keyed on feeTokenId. */
+    /** Seed a net-zero transfer of feeTokenId between two NON-payer accounts, so the result has a mutable map
+     *  keyed on feeTokenId while leaving the payer at 0 (any later payer debit is purely an assessed fee). */
     private AssessmentResult seededResult(final AccountID payer) {
         return new AssessmentResult(
                 List.of(asTokenTransferList(
-                        feeTokenId, List.of(asAccountAmount(payer, -100L), asAccountAmount(receiver, 100L)))),
-                List.of(asAccountAmount(payer, -100L), asAccountAmount(receiver, 100L)));
+                        feeTokenId, List.of(asAccountAmount(seedSrc, -100L), asAccountAmount(seedDst, 100L)))),
+                List.of(asAccountAmount(seedSrc, -100L), asAccountAmount(seedDst, 100L)));
     }
 
     private static CustomFee withRoyaltyFeeExempt(
