@@ -103,7 +103,7 @@ class StakingRewardOverflowPropertyTest {
                     .stakedNodeId(0L)
                     .build();
             final var h = history(rng, perHbarRate, periods);
-            final var node = StakingNodeInfo.newBuilder().nodeId(0L).deleted(false).rewardSumHistory(h).build();
+            final var node = StakingNodeInfo.newBuilder().number(0L).deleted(false).rewardSumHistory(h).build();
 
             final long got = StakeRewardCalculatorImpl.computeRewardFromDetails(
                     account, node, currentStakePeriod, effectiveStart);
