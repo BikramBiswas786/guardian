@@ -1,0 +1,65 @@
+name: hcn conservation harness
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ccr-ad1af091-f03m8h]
+    paths:
+      - "security-research/hcn-harness/**"
+      - ".github/workflows/hcn-conservation-harness.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  conservation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: guardian
+
+      - uses: actions/checkout@v4
+        with:
+          repository: hiero-ledger/hiero-consensus-node
+          ref: 75bc55e518f88f408f1598d6acecbbd0b10f455e
+          path: hcn
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Install harness
+        run: python3 guardian/security-research/hcn-harness/install.py hcn
+
+      - name: Run conservation tests
+        working-directory: hcn
+        run: >
+          ./gradlew :app-service-token-impl:test
+          --tests "*CustomFeeConservationPropertyTest"
+          --tests "*CustomFeeAssessmentStepTest"
+          --console=plain
+
+      - name: Summarise results
+        if: always()
+        working-directory: hcn/hedera-node/hedera-token-service-impl/build/test-results/test
+        run: |
+          for f in *Conservation*.xml *CustomFeeAssessmentStepTest*.xml; do
+            [ -f "$f" ] || continue
+            echo "=== $f"
+            grep -o '<testsuite [^>]*>' "$f"
+            grep -o '<testcase name="[^"]*"' "$f"
+            grep -A3 '<failure' "$f" | head -40
+            sed -n '/<system-out>/,/<\/system-out>/p' "$f" | grep -E 'conservation|CONSERVATION' | head -20
+          done
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: conservation-test-reports
+          path: |
+            hcn/hedera-node/hedera-token-service-impl/build/test-results/test/
+            hcn/hedera-node/hedera-token-service-impl/build/reports/tests/test/
