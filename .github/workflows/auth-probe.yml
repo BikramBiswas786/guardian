@@ -14,7 +14,7 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,24 +28,27 @@ jobs:
         with:
           distribution: temurin
           java-version: "25"
-      - name: Install probe
+      - name: Install probes
         run: python3 guardian/security-research/auth-probe/install.py hcn
-      - name: Run probe
+      - name: Run probes
         working-directory: hcn
         continue-on-error: true
         run: |
           set -o pipefail
-          ./gradlew :app-service-token-impl:test --tests "*UpdateTokenKeysAuthorizationProbeTest" --continue --console=plain 2>&1 | tee "$GITHUB_WORKSPACE/gradle.log"
+          ./gradlew :app-service-token-impl:test :app-service-contract-impl:test \
+            --tests "*UpdateTokenKeysAuthorizationProbeTest" \
+            --tests "*UpdateKeysSeverityProbeTest" \
+            --continue --console=plain 2>&1 | tee "$GITHUB_WORKSPACE/gradle.log"
       - name: Summarise
         if: always()
         run: |
           grep -E 'BUILD (SUCCESSFUL|FAILED)' gradle.log | tail -1 | sed 's/^/::notice title=gradle::/' || true
           grep -E '\.java:[0-9]+: error:' gradle.log | head -6 | while IFS= read -r l; do echo "::error title=compile::$l"; done || true
-          d=hcn/hedera-node/hedera-token-service-impl/build/test-results/test
-          for f in "$d"/*UpdateTokenKeysAuthorizationProbeTest*.xml; do
-            [ -f "$f" ] || continue
-            echo "::notice title=suite::$(grep -o '<testsuite [^>]*>' "$f" | grep -oE '(tests|skipped|failures|errors)="[^"]*"' | tr '\n' ' ')"
-            grep -o '<testcase name="[^"]*"' "$f" | sed 's/<testcase //' | while IFS= read -r l; do echo "::notice title=case::$l"; done
-            grep -o '<failure message="[^"]\{0,400\}' "$f" | head -4 | while IFS= read -r l; do echo "::error title=failure::$l"; done
+          for d in hcn/hedera-node/hedera-token-service-impl/build/test-results/test hcn/hedera-node/hedera-smart-contract-service-impl/build/test-results/test; do
+            for f in "$d"/*ProbeTest*.xml; do
+              [ -f "$f" ] || continue
+              echo "::notice title=suite::$(grep -o '<testsuite [^>]*>' "$f" | grep -oE '(name|tests|skipped|failures|errors)="[^"]*"' | tr '\n' ' ')"
+              grep -o '<testcase name="[^"]*"' "$f" | sed 's/<testcase //' | while IFS= read -r l; do echo "::notice title=case::$l"; done
+              grep -o '<failure message="[^"]\{0,400\}' "$f" | head -6 | while IFS= read -r l; do echo "::error title=failure::$l"; done
+            done
           done
-          [ -d "$d" ] || echo "::error title=no-results::test-results dir missing"
