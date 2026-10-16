@@ -64,6 +64,8 @@ public class CustomFeeConservationPropertyTest {
     private final AccountID sender = asAccount(0L, 0L, 4001);
     private final AccountID receiver = asAccount(0L, 0L, 5001);
     private final AccountID collector = asAccount(0L, 0L, 6666);
+    // Treasury must NOT be the payer: the treasury is exempt from its own token's custom fees, which would make every case vacuous.
+    private final AccountID treasury = asAccount(0L, 0L, 7777);
     private final AccountID[] others = {asAccount(0L, 0L, 8001), asAccount(0L, 0L, 8002), asAccount(0L, 0L, 8003)};
 
     // ---------------------------------------------------------------------------------------------- FRACTIONAL (non-net)
@@ -149,7 +151,7 @@ public class CustomFeeConservationPropertyTest {
             final Token nft = Token.newBuilder()
                     .tokenId(feeTokenId)
                     .tokenType(NON_FUNGIBLE_UNIQUE)
-                    .treasuryAccountId(sender)
+                    .treasuryAccountId(treasury)
                     .customFees(List.of(withRoyaltyFee(royalty, collector)))
                     .build();
 
@@ -185,6 +187,7 @@ public class CustomFeeConservationPropertyTest {
     private void runProperty(final String name, final Scenario scenario) {
         final var rng = new Random(MASTER_SEED);
         long checked = 0;
+        long charged = 0;
         for (int i = 0; i < ITERATIONS; i++) {
             final long seed = rng.nextLong();
             final Check c;
@@ -202,9 +205,15 @@ public class CustomFeeConservationPropertyTest {
                         .isZero();
             }
             checked++;
+            for (final TokenID tok : c.tokens()) {
+                if (collectorCredit(c.result(), tok) > 0) { charged++; break; }
+            }
         }
-        System.out.printf("[%s] conservation held across %d assessed cases (of %d; seed=0x%X)%n",
-                name, checked, ITERATIONS, MASTER_SEED);
+        System.out.printf("[%s] conservation held across %d assessed cases, %d with a fee actually charged (of %d; seed=0x%X)%n",
+                name, checked, charged, ITERATIONS, MASTER_SEED);
+        // Guard against a vacuous pass: every case rejected, or no fee ever reaching the collector.
+        assertThat(checked).withFailMessage("[%s] VACUOUS: no case was assessed", name).isPositive();
+        assertThat(charged).withFailMessage("[%s] VACUOUS: no case charged the collector (checked=%d)", name, checked).isPositive();
     }
 
     /** Net of every adjustment for one token: mutable input legs + newly assessed fee legs. */
@@ -218,6 +227,23 @@ public class CustomFeeConservationPropertyTest {
         return net;
     }
 
+    /** What the collector received for one token, across input legs and assessed fee legs. */
+    private long collectorCredit(final AssessmentResult result, final TokenID tok) {
+        long c = valueOf(result.getMutableInputBalanceAdjustments().get(tok), collector);
+        if (tok.equals(HBAR_TOKEN_ID)) {
+            c = Math.addExact(c, valueOf(result.getHbarAdjustments(), collector));
+        } else {
+            c = Math.addExact(c, valueOf(result.getHtsAdjustments().get(tok), collector));
+        }
+        return c;
+    }
+
+    private static long valueOf(final Map<AccountID, Long> m, final AccountID id) {
+        if (m == null) return 0L;
+        final Long v = m.get(id);
+        return v == null ? 0L : v;
+    }
+
     private static long sum(final Map<AccountID, Long> m) {
         if (m == null) return 0L;
         long s = 0L;
@@ -229,7 +255,7 @@ public class CustomFeeConservationPropertyTest {
         return Token.newBuilder()
                 .tokenId(feeTokenId)
                 .tokenType(FUNGIBLE_COMMON)
-                .treasuryAccountId(sender)
+                .treasuryAccountId(treasury)
                 .customFees(fees)
                 .build();
     }
