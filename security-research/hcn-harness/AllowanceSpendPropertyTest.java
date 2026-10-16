@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
 
 import com.hedera.hapi.node.base.AccountAmount;
 import com.hedera.hapi.node.base.AccountID;
@@ -81,9 +81,10 @@ class AllowanceSpendPropertyTest extends StepsBase {
         refreshWritableStores();
         writableTokenStore.put(nonFungibleToken.copyBuilder().kycKey((Key) null).build());
         givenStoresAndConfig(handleContext);
-        given(expiryValidator.expirationStatus(any(), anyBoolean(), anyLong())).willReturn(OK);
-        given(handleContext.savepointStack()).willReturn(stack);
-        given(handleContext.dispatchMetadata()).willReturn(HandleContext.DispatchMetadata.EMPTY_METADATA);
+        // Not every step reads these; keep them lenient so strict stubbing does not fail the run.
+        lenient().when(expiryValidator.expirationStatus(any(), anyBoolean(), anyLong())).thenReturn(OK);
+        lenient().when(handleContext.savepointStack()).thenReturn(stack);
+        lenient().when(handleContext.dispatchMetadata()).thenReturn(HandleContext.DispatchMetadata.EMPTY_METADATA);
         accts = List.of(payerId, ownerId, treasuryId, spenderId, transferAccountId, delegatingSpenderId);
         for (final var id : accts) {
             pristine.put(id, writableAccountStore.get(id));
