@@ -19,10 +19,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - mode: q776-baseline
-            tests: --tests "*UpdateKeysDecoderTest" --tests "*UpdateKeysDecoder16cTest"
-          - mode: q776-fix
-            tests: --tests "*UpdateKeysDecoderTest" --tests "*UpdateKeysDecoder16cTest" --tests "*.hts.update.*"
           - mode: jfxq-baseline
             tests: --tests "*InvalidSignatureConsistencyTest"
           - mode: jfxq-fix
