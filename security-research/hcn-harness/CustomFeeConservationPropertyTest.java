@@ -10,7 +10,8 @@ package com.hedera.node.app.service.token.impl.test.handlers.transfer.customfees
 // so neither Gradle nor a manual javac classpath can compile the module there. RUN IT where the repo builds:
 //     ./gradlew :app-service-token-impl:test --tests "*CustomFeeConservationPropertyTest"
 // Place at: hedera-node/hedera-token-service-impl/src/test/java/com/hedera/node/app/service/token/impl/test/handlers/transfer/customfees/
-// Override iteration count / seed with: -Dconservation.iterations=1000000 -Dconservation.seed=0xDEADBEEF
+// Override iteration count / seed with -Dconservation.iterations / -Dconservation.seed, or the env vars
+// CONSERVATION_ITERATIONS / CONSERVATION_SEED (Gradle does not forward -D flags to the test JVM; env is inherited).
 //
 // INVARIANT (value conservation): a custom fee only MOVES value, never creates or destroys it. After assessment, for
 // every token touched, the net of all adjustments (mutable input legs + newly assessed fee legs) must still equal the
@@ -56,8 +57,17 @@ import org.junit.jupiter.api.Test;
 
 public class CustomFeeConservationPropertyTest {
 
-    private static final int ITERATIONS = Integer.getInteger("conservation.iterations", 200_000);
-    private static final long MASTER_SEED = Long.getLong("conservation.seed", 0xC0FFEEL);
+    private static final int ITERATIONS = Integer.decode(cfg("conservation.iterations", "CONSERVATION_ITERATIONS", "200000"));
+    private static final long MASTER_SEED = Long.decode(cfg("conservation.seed", "CONSERVATION_SEED", "0xC0FFEE"));
+    /** Upper bound for "large" amounts: big enough to drive fraction/multiply overflow paths, small enough that legs sum. */
+    private static final long BIG = Long.MAX_VALUE / 4;
+
+    private static String cfg(final String prop, final String env, final String dflt) {
+        final String p = System.getProperty(prop);
+        if (p != null && !p.isBlank()) return p.trim();
+        final String e = System.getenv(env);
+        return (e != null && !e.isBlank()) ? e.trim() : dflt;
+    }
 
     private final TokenID feeTokenId = asToken(3000); // the token that carries the custom fee
     private final TokenID payTokenId = asToken(3001); // a distinct fungible token used as exchange value for royalty
@@ -71,30 +81,49 @@ public class CustomFeeConservationPropertyTest {
     // ---------------------------------------------------------------------------------------------- FRACTIONAL (non-net)
     @Test
     void fractionalFeeConservesValue() {
+        fractional("fractional", false, 10_000_000L, 1_000_000L);
+    }
+
+    @Test
+    void fractionalNetOfTransfersConservesValue() {
+        fractional("fractional-net", true, 10_000_000L, 1_000_000L);
+    }
+
+    @Test
+    void fractionalLargeAmountsConserveValue() {
+        fractional("fractional-large", false, BIG, 1_000_000_000_000L);
+    }
+
+    @Test
+    void fractionalNetOfTransfersLargeAmountsConserveValue() {
+        fractional("fractional-net-large", true, BIG, 1_000_000_000_000L);
+    }
+
+    private void fractional(final String name, final boolean netOfTransfers, final long maxTrigger, final long maxDen) {
         final var subject = new CustomFractionalFeeAssessor(new CustomFixedFeeAssessor());
-        runProperty("fractional", (local, seed) -> {
-            final long trigger = 1L + Math.floorMod(local.nextLong(), 10_000_000L);
+        runProperty(name, (local, seed) -> {
+            final long trigger = 1L + Math.floorMod(local.nextLong(), maxTrigger);
             final int n = 1 + local.nextInt(others.length);
             final long[] credits = splitPositive(trigger, n, local);
             final var legs = new ArrayList<AccountAmount>();
             legs.add(asAccountAmount(sender, -trigger));
             for (int r = 0; r < n; r++) legs.add(asAccountAmount(others[r], credits[r]));
 
-            final long den = 1L + Math.floorMod(local.nextLong(), 1_000_000L);
+            final long den = 1L + Math.floorMod(local.nextLong(), maxDen);
             final long num = Math.floorMod(local.nextLong(), den + 1);
             final long min = Math.floorMod(local.nextLong(), 1_000L);
             final long max = local.nextBoolean() ? 0L : min + Math.floorMod(local.nextLong(), 1_000_000L);
             final var fee = FractionalFee.newBuilder()
-                    .netOfTransfers(false)
+                    .netOfTransfers(netOfTransfers)
                     .minimumAmount(min)
                     .maximumAmount(max)
                     .fractionalAmount(Fraction.newBuilder().numerator(num).denominator(den).build())
                     .build();
-            final Token token = fungibleWith(List.of(withFractionalFee(fee, collector, false)));
+            final Token token = fungibleWith(List.of(withFractionalFee(fee, collector, netOfTransfers)));
             final var result = new AssessmentResult(List.of(asTokenTransferList(feeTokenId, legs)), List.of());
 
             subject.assessFractionalFees(token, sender, result);
-            return new Check(result, List.of(feeTokenId), "trigger=" + trigger + " num=" + num + " den=" + den
+            return new Check(result, List.of(feeTokenId), "net=" + netOfTransfers + " trigger=" + trigger + " num=" + num + " den=" + den
                     + " min=" + min + " max=" + max + " credits=" + Arrays.toString(credits));
         });
     }
@@ -102,9 +131,18 @@ public class CustomFeeConservationPropertyTest {
     // ------------------------------------------------------------------------------------------------------ FIXED FEE
     @Test
     void fixedFeeConservesValue() {
+        fixed("fixed", 1_000_000_000L);
+    }
+
+    @Test
+    void fixedFeeLargeAmountsConserveValue() {
+        fixed("fixed-large", BIG);
+    }
+
+    private void fixed(final String name, final long maxAmount) {
         final var subject = new CustomFixedFeeAssessor();
-        runProperty("fixed", (local, seed) -> {
-            final long amount = 1L + Math.floorMod(local.nextLong(), 1_000_000_000L);
+        runProperty(name, (local, seed) -> {
+            final long amount = 1L + Math.floorMod(local.nextLong(), maxAmount);
             final int mode = local.nextInt(3); // 0=hbar, 1=self-denominated HTS, 2=other-denominated HTS
             final FixedFee.Builder fb = FixedFee.newBuilder().amount(amount);
             final List<TokenID> tokensOfInterest = new ArrayList<>();
@@ -137,11 +175,20 @@ public class CustomFeeConservationPropertyTest {
     // ---------------------------------------------------------------------------------------- ROYALTY (exchanged value)
     @Test
     void royaltyFeeExchangedValueConservesValue() {
+        royalty("royalty", 10_000_000L, 1_000L);
+    }
+
+    @Test
+    void royaltyFeeLargeAmountsConserveValue() {
+        royalty("royalty-large", BIG, 1_000_000_000_000L);
+    }
+
+    private void royalty(final String name, final long maxExchanged, final long maxDen) {
         final var subject = new CustomRoyaltyFeeAssessor(new CustomFixedFeeAssessor());
-        runProperty("royalty", (local, seed) -> {
+        runProperty(name, (local, seed) -> {
             // NFT sender receives fungible value in exchange; royalty takes a fraction of that credit.
-            final long exchanged = 1L + Math.floorMod(local.nextLong(), 10_000_000L);
-            final long den = 1L + Math.floorMod(local.nextLong(), 1_000L);
+            final long exchanged = 1L + Math.floorMod(local.nextLong(), maxExchanged);
+            final long den = 1L + Math.floorMod(local.nextLong(), maxDen);
             final long num = Math.floorMod(local.nextLong(), den + 1); // 0..den, so royalty <= exchanged
             final boolean hbarExchange = local.nextBoolean();
 
@@ -188,13 +235,21 @@ public class CustomFeeConservationPropertyTest {
         final var rng = new Random(MASTER_SEED);
         long checked = 0;
         long charged = 0;
+        long rejected = 0;
+        final List<String> unexpected = new ArrayList<>();
         for (int i = 0; i < ITERATIONS; i++) {
             final long seed = rng.nextLong();
             final Check c;
             try {
                 c = scenario.run(new Random(seed), seed);
             } catch (final HandleException e) {
+                rejected++;
                 continue; // legitimate rejection (e.g. CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE), not a conservation break
+            } catch (final RuntimeException e) {
+                // Not a status-coded rejection: a raw exception escaping the assessor. Record with seed; keep going.
+                if (unexpected.size() < 5) unexpected.add(e.getClass().getSimpleName() + ": " + e.getMessage() + " seed=" + seed);
+                else unexpected.add("");
+                continue;
             }
             for (final TokenID tok : c.tokens()) {
                 final long net = netFor(c.result(), tok);
@@ -209,8 +264,12 @@ public class CustomFeeConservationPropertyTest {
                 if (collectorCredit(c.result(), tok) > 0) { charged++; break; }
             }
         }
-        System.out.printf("[%s] conservation held across %d assessed cases, %d with a fee actually charged (of %d; seed=0x%X)%n",
-                name, checked, charged, ITERATIONS, MASTER_SEED);
+        System.out.printf("[%s] conservation held across %d assessed cases, %d with a fee actually charged, %d rejected, %d unexpected exceptions (of %d; seed=0x%X)%n",
+                name, checked, charged, rejected, unexpected.size(), ITERATIONS, MASTER_SEED);
+        assertThat(unexpected)
+                .withFailMessage("[%s] UNEXPECTED EXCEPTION x%d, first: %s", name, unexpected.size(),
+                        unexpected.stream().filter(x -> !x.isEmpty()).limit(5).toList())
+                .isEmpty();
         // Guard against a vacuous pass: every case rejected, or no fee ever reaching the collector.
         assertThat(checked).withFailMessage("[%s] VACUOUS: no case was assessed", name).isPositive();
         assertThat(charged).withFailMessage("[%s] VACUOUS: no case charged the collector (checked=%d)", name, checked).isPositive();
