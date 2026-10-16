@@ -111,3 +111,147 @@
     // If any field name differs in your checkout, copy the exact one from the sibling test methods
     // (e.g. hbarFixedFeeAndRoyaltyFeeWithFallback) — they use the same fixtures.
     // ---------------------------------------------------------------------------------------------------------------
+
+    // =================================================================================================================
+    // RANDOMIZED multi-level conservation: random fee schedules on the fungible token and the NFT, run through the real
+    // CustomFeeAssessmentStep. Every accepted assessment must net to 0 per asset across all levels. Rejections
+    // (HandleException, e.g. insufficient balance or an unassociated collector) are legitimate and only counted.
+    // Override with env CONSERVATION_MULTILEVEL_ITERATIONS / CONSERVATION_SEED (Gradle does not forward -D flags to the
+    // test JVM; the environment is inherited), or the matching -D system properties when running the JVM directly.
+    // =================================================================================================================
+    @Test
+    @DisplayName("CONSERVATION: randomized fee schedules conserve value across all assessment levels")
+    void conservationRandomizedMultiLevel() {
+        final int iterations = Integer.decode(multiLevelCfg(
+                "conservation.multilevel.iterations", "CONSERVATION_MULTILEVEL_ITERATIONS", "3000"));
+        final long masterSeed = Long.decode(multiLevelCfg("conservation.seed", "CONSERVATION_SEED", "0xC0FFEE"));
+        givenTxn();
+        final var replacedOp = getReplacedOp();
+        final var rng = new java.util.Random(masterSeed);
+        int accepted = 0;
+        int rejected = 0;
+        int maxLevels = 0;
+        int charged = 0; // accepted assessments where at least one fee actually moved value
+        final java.util.Map<String, Integer> rejectionCodes = new java.util.TreeMap<>();
+        for (int i = 0; i < iterations; i++) {
+            final long seed = rng.nextLong();
+            final var r = new java.util.Random(seed);
+            final var desc = new StringBuilder("seed=").append(seed);
+
+            final var fungibleFees = new java.util.ArrayList<com.hedera.hapi.node.transaction.CustomFee>();
+            final int nFees = r.nextInt(4); // 0..3 fees on the fungible token
+            for (int f = 0; f < nFees; f++) {
+                switch (r.nextInt(4)) {
+                    case 0 -> {
+                        final long amt = 1 + r.nextInt(5_000);
+                        fungibleFees.add(withFixedFee(hbarFixedFee.copyBuilder().amount(amt).build()));
+                        desc.append(" fixedHbar=").append(amt);
+                    }
+                    case 1 -> {
+                        final long amt = 1 + r.nextInt(200);
+                        fungibleFees.add(withFixedFee(htsFixedFee.copyBuilder().amount(amt).build()));
+                        desc.append(" fixedHtsSelf=").append(amt);
+                    }
+                    case 2 -> {
+                        final long amt = 1 + r.nextInt(200);
+                        fungibleFees.add(withFixedFee(htsFixedFee
+                                .copyBuilder()
+                                .amount(amt)
+                                .denominatingTokenId(fungibleTokenIDB)
+                                .build()));
+                        desc.append(" fixedHtsOther=").append(amt);
+                    }
+                    default -> {
+                        final long den = 1 + r.nextInt(1_000);
+                        final long num = r.nextInt((int) den + 1);
+                        final long min = r.nextInt(51);
+                        final long max = r.nextBoolean() ? 0 : min + r.nextInt(500);
+                        final boolean net = r.nextBoolean();
+                        fungibleFees.add(withFractionalFee(fractionalFee
+                                .copyBuilder()
+                                .fractionalAmount(com.hedera.hapi.node.base.Fraction.newBuilder()
+                                        .numerator(num)
+                                        .denominator(den)
+                                        .build())
+                                .minimumAmount(min)
+                                .maximumAmount(max)
+                                .netOfTransfers(net)
+                                .build()));
+                        desc.append(" fractional=").append(num).append('/').append(den)
+                                .append(",min=").append(min).append(",max=").append(max).append(",net=").append(net);
+                    }
+                }
+            }
+
+            final var nftFees = new java.util.ArrayList<com.hedera.hapi.node.transaction.CustomFee>();
+            if (r.nextBoolean()) {
+                final long den = 1 + r.nextInt(100);
+                final long num = r.nextInt((int) den + 1);
+                final var royalty = royaltyFee.copyBuilder()
+                        .exchangeValueFraction(com.hedera.hapi.node.base.Fraction.newBuilder()
+                                .numerator(num)
+                                .denominator(den)
+                                .build());
+                switch (r.nextInt(3)) {
+                    case 0 -> {
+                        royalty.fallbackFee((FixedFee) null);
+                        desc.append(" royalty=").append(num).append('/').append(den).append(",noFallback");
+                    }
+                    case 1 -> {
+                        final long amt = 1 + r.nextInt(5_000);
+                        royalty.fallbackFee(hbarFixedFee.copyBuilder().amount(amt).build());
+                        desc.append(" royalty=").append(num).append('/').append(den).append(",hbarFallback=").append(amt);
+                    }
+                    default -> {
+                        final long amt = 1 + r.nextInt(200);
+                        royalty.fallbackFee(htsFixedFee.copyBuilder().amount(amt).build());
+                        desc.append(" royalty=").append(num).append('/').append(den).append(",htsFallback=").append(amt);
+                    }
+                }
+                nftFees.add(withRoyaltyFee(royalty.build()));
+            }
+
+            writableTokenStore.put(fungibleWithNoKyc.copyBuilder().customFees(fungibleFees).build());
+            writableTokenStore.put(nonFungibleWithNoKyc.copyBuilder().customFees(nftFees).build());
+
+            final List<CryptoTransferTransactionBody> ops;
+            try {
+                // A fresh step per iteration: CustomFeeAssessmentStep keeps a level counter that is never reset.
+                ops = new CustomFeeAssessmentStep(replacedOp)
+                        .assessCustomFees(new TransferContextImpl(handleContext, false, false));
+            } catch (final com.hedera.node.app.spi.workflows.HandleException e) {
+                rejected++;
+                rejectionCodes.merge(e.getStatus().protoName(), 1, Integer::sum);
+                continue;
+            }
+            try {
+                assertConservedAcrossLevels(ops, 0L);
+            } catch (final AssertionError e) {
+                throw new AssertionError("Randomized multi-level conservation break: " + desc, e);
+            }
+            accepted++;
+            maxLevels = Math.max(maxLevels, ops.size());
+            // A fee was charged if assessment added a level or changed the given op (fractional fees edit level 0).
+            if (ops.size() > 1 || !ops.get(0).equals(replacedOp)) {
+                charged++;
+            }
+        }
+        System.out.printf(
+                "[multilevel-random] conservation held across %d accepted assessments, %d charging a fee (%d rejected: %s; max levels=%d; seed=0x%X)%n",
+                accepted, charged, rejected, rejectionCodes, maxLevels, masterSeed);
+        // Guard against a vacuous pass: enough schedules must be assessed, and many must actually charge a fee
+        // (e.g. a payer that is the token treasury is exempt from its fees, which would make every case trivial).
+        assertThat(accepted)
+                .withFailMessage("[multilevel-random] VACUOUS: only %d of %d schedules accepted", accepted, iterations)
+                .isGreaterThan(iterations / 10);
+        assertThat(charged)
+                .withFailMessage("[multilevel-random] VACUOUS: only %d accepted assessments charged a fee", charged)
+                .isGreaterThan(accepted / 10);
+    }
+
+    private static String multiLevelCfg(final String property, final String env, final String fallback) {
+        final String p = System.getProperty(property);
+        if (p != null && !p.isBlank()) return p;
+        final String e = System.getenv(env);
+        return e != null && !e.isBlank() ? e : fallback;
+    }

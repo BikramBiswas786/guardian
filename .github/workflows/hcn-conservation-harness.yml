@@ -13,12 +13,18 @@ permissions:
 
 jobs:
   conservation:
+    name: conservation (${{ matrix.label }}, seed ${{ matrix.seed }})
     runs-on: ubuntu-latest
     timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
-        seed: ["0xC0FFEE", "0x5EED1234", "0xDEADBEEF"]
+        include:
+          - { label: pinned-75bc55e, ref: 75bc55e518f88f408f1598d6acecbbd0b10f455e, seed: "0xC0FFEE" }
+          - { label: pinned-75bc55e, ref: 75bc55e518f88f408f1598d6acecbbd0b10f455e, seed: "0x5EED1234" }
+          - { label: pinned-75bc55e, ref: 75bc55e518f88f408f1598d6acecbbd0b10f455e, seed: "0xDEADBEEF" }
+          # Newest upstream code: where unreviewed changes land.
+          - { label: upstream-main, ref: main, seed: "0xC0FFEE" }
     env:
       CONSERVATION_ITERATIONS: "1000000"
       CONSERVATION_SEED: ${{ matrix.seed }}
@@ -30,13 +36,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: hiero-ledger/hiero-consensus-node
-          ref: 75bc55e518f88f408f1598d6acecbbd0b10f455e
+          ref: ${{ matrix.ref }}
           path: hcn
 
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "25"
+
+      - name: Record tested commit
+        working-directory: hcn
+        run: echo "::notice title=commit::$(git log -1 --format='%H %cd %s' --date=iso)"
 
       - name: Install harness
         run: python3 guardian/security-research/hcn-harness/install.py hcn
@@ -68,7 +78,7 @@ jobs:
         if: always()
         run: |
           d=hcn/hedera-node/hedera-token-service-impl/build/test-results/test
-          for f in "$d"/*Conservation*.xml; do
+          for f in "$d"/*Conservation*.xml "$d"/*CustomFeeAssessmentStepTest*.xml; do
             [ -f "$f" ] || continue
             grep -oE '\[[a-z-]+\] (conservation held|CONSERVATION BREAK|VACUOUS|UNEXPECTED)[^<]*' "$f" | head -10 | while IFS= read -r l; do echo "::notice title=result::$l"; done
           done
@@ -77,7 +87,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: conservation-test-reports-${{ matrix.seed }}
+          name: conservation-test-reports-${{ matrix.label }}-${{ matrix.seed }}
           path: |
             hcn/hedera-node/hedera-token-service-impl/build/test-results/test/
             hcn/hedera-node/hedera-token-service-impl/build/reports/tests/test/
