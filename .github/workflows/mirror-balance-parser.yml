@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "21"
+          java-version: "25"
       - name: Install evidence test
         run: python3 guardian/security-research/mirror-node/install.py mn
       - name: Run parser test
