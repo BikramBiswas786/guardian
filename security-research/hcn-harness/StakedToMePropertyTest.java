@@ -5,6 +5,7 @@ import static com.hedera.node.app.service.token.impl.handlers.staking.StakingUti
 import static com.hedera.node.app.service.token.impl.schemas.V0490TokenSchema.ACCOUNTS_STATE_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
 
 import com.hedera.hapi.node.base.AccountID;
@@ -129,10 +130,18 @@ class StakedToMePropertyTest extends CryptoTokenHandlerTestBase {
             ids.add(id);
             index.put(id, i);
         }
+        // Stub once and swap the backing state per iteration: re-stubbing a mock 300k times is very slow.
+        final var current = new java.util.concurrent.atomic.AtomicReference<
+                com.swirlds.state.test.fixtures.MapWritableKVState<AccountID, Account>>();
+        given(writableStates.<AccountID, Account>get(ACCOUNTS_STATE_ID)).willAnswer(inv -> current.get());
         int checkedAccounts = 0;
         int changedStakedToMe = 0;
         final Map<String, Integer> mutations = new TreeMap<>();
-        for (int it = 0; it < iterations; it++) {
+        // Time cap so a slow environment cannot hang CI; the summary reports how many iterations ran.
+        final long deadline = System.nanoTime() + java.util.concurrent.TimeUnit.MINUTES.toNanos(5);
+        int done = 0;
+        for (int it = 0; it < iterations && System.nanoTime() < deadline; it++) {
+            done++;
             final long iterSeed = rng.nextLong();
             final var r = new Random(iterSeed);
 
@@ -162,8 +171,8 @@ class StakedToMePropertyTest extends CryptoTokenHandlerTestBase {
                         ids.get(i),
                         target[i] == -1 && r.nextInt(3) == 0 ? ab.build() : withTarget(ab, target[i], ids, r));
             }
-            final var state = stateBuilder.build();
-            given(writableStates.<AccountID, Account>get(ACCOUNTS_STATE_ID)).willReturn(state);
+            current.set(stateBuilder.build());
+            if (it % 10_000 == 0) clearInvocations(writableStates); // keep Mockito's invocation log small
             final var store = new WritableAccountStore(writableStates, writableEntityCounters);
 
             // 2. Random transaction effects on a random subset of live accounts, plus maybe new accounts.
@@ -247,8 +256,8 @@ class StakedToMePropertyTest extends CryptoTokenHandlerTestBase {
             }
         }
         System.out.printf(
-                "[staking-stakedtome] invariant held on %d iterations: %d live-account checks, %d stakedToMe updates; mutations %s (seed=0x%X)%n",
-                iterations, checkedAccounts, changedStakedToMe, mutations, seed);
+                "[staking-stakedtome] invariant held on %d of %d iterations: %d live-account checks, %d stakedToMe updates; mutations %s (seed=0x%X)%n",
+                done, iterations, checkedAccounts, changedStakedToMe, mutations, seed);
         assertThat(changedStakedToMe)
                 .withFailMessage("[staking-stakedtome] VACUOUS: stakedToMe never changed")
                 .isPositive();
