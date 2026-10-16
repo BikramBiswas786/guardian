@@ -230,11 +230,12 @@ class AllowanceSpendPropertyTest extends StepsBase {
                     .isApproval(r.nextBoolean())
                     .build());
         }
-        // Split the total among the credited accounts.
-        final int nCredits = n - out.size();
+        // Split the total among the credited accounts (the participants after the debited ones).
+        final int debitCount = out.size();
+        final int nCredits = n - debitCount;
         long remaining = totalDebit;
         for (int i = 0; i < nCredits; i++) {
-            final var id = parts.get(out.size() + i);
+            final var id = parts.get(debitCount + i);
             final long credit = (i == nCredits - 1) ? remaining : (remaining == 0 ? 0 : (r.nextLong() >>> 1) % (remaining + 1));
             remaining -= credit;
             if (credit == 0 && i < nCredits - 1) continue;
