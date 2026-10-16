@@ -71,6 +71,13 @@ class UpdateKeysSeverityProbeTest {
                 BigInteger.valueOf(keyType), Tuple.of(Boolean.FALSE, contractKey, new byte[0], new byte[0], ZERO_ADDRESS));
     }
 
+    /** An entry whose key material is a concrete ed25519 key (non-empty, so it does not hit the Key.DEFAULT guard). */
+    private static Tuple tokenKeyEd(final long keyType, final byte fill) {
+        final byte[] ed = new byte[32];
+        java.util.Arrays.fill(ed, fill);
+        return Tuple.of(BigInteger.valueOf(keyType), Tuple.of(Boolean.FALSE, ZERO_ADDRESS, ed, new byte[0], ZERO_ADDRESS));
+    }
+
     private TokenUpdateTransactionBody decodeBody(final Tuple... keys) {
         final var encoded = Bytes.wrapByteBuffer(
                 UpdateKeysTranslator.TOKEN_UPDATE_KEYS_FUNCTION.encodeCallWithArgs(FUNGIBLE_TOKEN_HEADLONG_ADDRESS, keys));
@@ -122,13 +129,20 @@ class UpdateKeysSeverityProbeTest {
         // Two admin-key (0x01) entries with different contract-key material. Whichever wins, it must be one of the
         // two values the (authorized) caller submitted -- i.e. the stored authoritative key is not corrupted into
         // some third/unexpected value. This checks there is no authoritative-integrity escalation hiding in scenario F.
-        final Address a = FUNGIBLE_TOKEN_HEADLONG_ADDRESS;
-        final var op = decodeBody(tokenKey(0x01, a), tokenKey(0x01, ZERO_ADDRESS));
+        final var k1 = tokenKeyEd(0x01, (byte) 0x11);
+        final var k2 = tokenKeyEd(0x01, (byte) 0x22);
+        final var op = decodeBody(k1, k2);
         if (op != null && op.adminKey() != null) {
             final var admin = op.adminKey();
-            final boolean isContractKey = admin.contractID() != null;
-            assertThat(isContractKey)
-                    .withFailMessage("duplicate admin resolved to unexpected key kind: %s", admin)
+            final byte[] e1 = new byte[32];
+            java.util.Arrays.fill(e1, (byte) 0x11);
+            final byte[] e2 = new byte[32];
+            java.util.Arrays.fill(e2, (byte) 0x22);
+            final boolean isOneSubmitted = admin.ed25519() != null
+                    && (java.util.Arrays.equals(admin.ed25519().toByteArray(), e1)
+                            || java.util.Arrays.equals(admin.ed25519().toByteArray(), e2));
+            assertThat(isOneSubmitted)
+                    .withFailMessage("duplicate admin resolved to a value the caller did NOT submit: %s", admin)
                     .isTrue();
         }
     }
