@@ -82,7 +82,7 @@ jobs:
           d=hcn/hedera-node/hedera-token-service-impl/build/test-results/test
           for f in "$d"/*Conservation*.xml "$d"/*CustomFeeAssessmentStepTest*.xml; do
             [ -f "$f" ] || continue
-            grep -oE '\[[a-z-]+\] (conservation held|CONSERVATION BREAK|VACUOUS|UNEXPECTED)[^<]*|(UNEXPECTED BENEFICIARY|RECORD/LEDGER MISMATCH|CONSERVATION BREAK|Randomized multi-level invariant break)[^<]{0,400}' "$f" | head -15 | while IFS= read -r l; do echo "::notice title=result::$l"; done
+            grep -oE '\[[a-z-]+\] (conservation held|CONSERVATION BREAK|VACUOUS|UNEXPECTED)[^<]*|(UNEXPECTED BENEFICIARY|RECORD/LEDGER MISMATCH|CONSERVATION BREAK|Randomized multi-level invariant break|Randomized multi-level oracle error)[^<]{0,400}' "$f" | head -15 | while IFS= read -r l; do echo "::notice title=result::$l"; done
           done
 
       - name: Summarise hook authorization results

@@ -35,19 +35,19 @@
     /** Sum every account amount across every returned op, per asset, and assert each asset nets to `expectedNet`. */
     private void assertConservedAcrossLevels(
             final List<CryptoTransferTransactionBody> ops, final long expectedNet) {
-        final Map<String, Long> netByAsset = new HashMap<>();
+        final Map<String, java.math.BigInteger> netByAsset = new HashMap<>();
         for (final var op : ops) {
             // hbar legs
             if (op.transfers() != null) {
                 for (final AccountAmount aa : op.transfers().accountAmounts()) {
-                    netByAsset.merge(HBAR_KEY, aa.amount(), Math::addExact);
+                    netByAsset.merge(HBAR_KEY, java.math.BigInteger.valueOf(aa.amount()), java.math.BigInteger::add);
                 }
             }
             // fungible token legs (NFT ownership changes move no fungible units, so they don't affect conservation)
             for (final var ttl : op.tokenTransfers()) {
                 final TokenID tokenId = ttl.token();
                 for (final AccountAmount aa : ttl.transfers()) {
-                    netByAsset.merge("TOKEN:" + tokenId, aa.amount(), Math::addExact);
+                    netByAsset.merge("TOKEN:" + tokenId, java.math.BigInteger.valueOf(aa.amount()), java.math.BigInteger::add);
                 }
             }
         }
@@ -56,7 +56,7 @@
                     .withFailMessage(
                             "CONSERVATION BREAK across %d level(s): asset %s nets to %d, expected %d. Per-asset nets: %s",
                             ops.size(), e.getKey(), e.getValue(), expectedNet, netByAsset)
-                    .isEqualTo(expectedNet);
+                    .isEqualTo(java.math.BigInteger.valueOf(expectedNet));
         }
     }
 
@@ -206,8 +206,8 @@
             } catch (final RuntimeException e) {
                 unexpected++;
                 if (unexpected <= 5) {
-                    System.out.printf("[multilevel-random] UNEXPECTED %s: %s (%s)%n", e.getClass().getName(),
-                            e.getMessage(), desc);
+                    System.out.printf("[multilevel-random] UNEXPECTED %s: %s at %s (%s)%n", e.getClass().getName(),
+                            e.getMessage(), topFrames(e), desc);
                 }
                 continue;
             }
@@ -217,6 +217,8 @@
                 assertRecordMatchesLedger(baseNets, netsByAssetAndAccount(ops), transferContext.getAssessedCustomFees());
             } catch (final AssertionError e) {
                 throw new AssertionError("Randomized multi-level invariant break: " + desc, e);
+            } catch (final RuntimeException e) {
+                throw new AssertionError("Randomized multi-level oracle error " + e + " at " + topFrames(e) + ": " + desc, e);
             }
             accepted++;
             maxLevels = Math.max(maxLevels, ops.size());
@@ -302,17 +304,17 @@
     }
 
     /** Net amount per "asset|account" summed over all ops (asset keys match assertConservedAcrossLevels). */
-    private static Map<String, Long> netsByAssetAndAccount(final List<CryptoTransferTransactionBody> ops) {
-        final Map<String, Long> nets = new HashMap<>();
+    private static Map<String, java.math.BigInteger> netsByAssetAndAccount(final List<CryptoTransferTransactionBody> ops) {
+        final Map<String, java.math.BigInteger> nets = new HashMap<>();
         for (final var op : ops) {
             if (op.transfers() != null) {
                 for (final AccountAmount aa : op.transfers().accountAmounts()) {
-                    nets.merge(HBAR_KEY + "|" + aa.accountID(), aa.amount(), Math::addExact);
+                    nets.merge(HBAR_KEY + "|" + aa.accountID(), java.math.BigInteger.valueOf(aa.amount()), java.math.BigInteger::add);
                 }
             }
             for (final var ttl : op.tokenTransfers()) {
                 for (final AccountAmount aa : ttl.transfers()) {
-                    nets.merge("TOKEN:" + ttl.token() + "|" + aa.accountID(), aa.amount(), Math::addExact);
+                    nets.merge("TOKEN:" + ttl.token() + "|" + aa.accountID(), java.math.BigInteger.valueOf(aa.amount()), java.math.BigInteger::add);
                 }
             }
         }
@@ -320,11 +322,12 @@
     }
 
     /** Only the fee collector may end up better off than in the given op. */
-    private void assertNoUnexpectedBeneficiary(final Map<String, Long> base, final Map<String, Long> after) {
+    private void assertNoUnexpectedBeneficiary(
+            final Map<String, java.math.BigInteger> base, final Map<String, java.math.BigInteger> after) {
         final String collectorSuffix = "|" + feeCollectorId;
         for (final var e : after.entrySet()) {
-            final long delta = e.getValue() - base.getOrDefault(e.getKey(), 0L);
-            if (delta > 0 && !e.getKey().endsWith(collectorSuffix)) {
+            final var delta = e.getValue().subtract(base.getOrDefault(e.getKey(), java.math.BigInteger.ZERO));
+            if (delta.signum() > 0 && !e.getKey().endsWith(collectorSuffix)) {
                 throw new AssertionError("UNEXPECTED BENEFICIARY: " + e.getKey() + " gained " + delta
                         + " beyond the given op. base=" + base + " after=" + after);
             }
@@ -333,26 +336,37 @@
 
     /** Per (collector, asset), the assessed fees in the record must equal what the collector actually received. */
     private void assertRecordMatchesLedger(
-            final Map<String, Long> base,
-            final Map<String, Long> after,
+            final Map<String, java.math.BigInteger> base,
+            final Map<String, java.math.BigInteger> after,
             final List<com.hedera.hapi.node.transaction.AssessedCustomFee> assessed) {
-        final Map<String, Long> recorded = new HashMap<>();
+        final Map<String, java.math.BigInteger> recorded = new HashMap<>();
         for (final var fee : assessed) {
             final String asset = fee.tokenId() == null ? HBAR_KEY : "TOKEN:" + fee.tokenId();
-            recorded.merge(asset + "|" + fee.feeCollectorAccountId(), fee.amount(), Math::addExact);
+            recorded.merge(asset + "|" + fee.feeCollectorAccountId(), java.math.BigInteger.valueOf(fee.amount()), java.math.BigInteger::add);
         }
         final java.util.Set<String> keys = new java.util.HashSet<>(recorded.keySet());
         for (final var k : after.keySet()) {
             if (k.endsWith("|" + feeCollectorId)) keys.add(k);
         }
         for (final var k : keys) {
-            final long received = after.getOrDefault(k, 0L) - base.getOrDefault(k, 0L);
-            final long inRecord = recorded.getOrDefault(k, 0L);
-            if (received != inRecord) {
+            final var received = after.getOrDefault(k, java.math.BigInteger.ZERO)
+                    .subtract(base.getOrDefault(k, java.math.BigInteger.ZERO));
+            final var inRecord = recorded.getOrDefault(k, java.math.BigInteger.ZERO);
+            if (!received.equals(inRecord)) {
                 throw new AssertionError("RECORD/LEDGER MISMATCH for " + k + ": record says " + inRecord
                         + ", ledger moved " + received + ". recorded=" + recorded + " assessed=" + assessed);
             }
         }
+    }
+
+    private static String topFrames(final Throwable t) {
+        final var sb = new StringBuilder();
+        final var frames = t.getStackTrace();
+        for (int k = 0; k < Math.min(8, frames.length); k++) {
+            sb.append(k == 0 ? "" : " <- ").append(frames[k].getClassName().replaceAll(".*\\.", ""))
+                    .append('.').append(frames[k].getMethodName()).append(':').append(frames[k].getLineNumber());
+        }
+        return sb.toString();
     }
 
     private static String multiLevelCfg(final String property, final String env, final String fallback) {
