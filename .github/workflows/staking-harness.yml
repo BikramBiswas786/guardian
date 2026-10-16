@@ -1,0 +1,59 @@
+name: staking harness
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [advisory-recheck]
+    paths:
+      - "security-research/staking-harness/**"
+      - ".github/workflows/staking-harness.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  staking:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: ["0x57A41E", "0x5EED1234"]
+    env:
+      STAKING_ITERATIONS: "500000"
+      STAKING_SEED: ${{ matrix.seed }}
+    name: staking (${{ matrix.seed }})
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: guardian
+      - uses: actions/checkout@v4
+        with:
+          repository: hiero-ledger/hiero-consensus-node
+          ref: a00481bcf7739f527df6375faf15fb1b3969bd83
+          path: hcn
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - name: Install harness
+        run: python3 guardian/security-research/staking-harness/install.py hcn
+      - name: Run
+        working-directory: hcn
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          ./gradlew :app-service-token-impl:test --tests "*StakingRewardOverflowPropertyTest" --continue --console=plain 2>&1 | tee "$GITHUB_WORKSPACE/gradle.log"
+      - name: Summarise
+        if: always()
+        run: |
+          grep -E 'BUILD (SUCCESSFUL|FAILED)' gradle.log | tail -1 | sed 's/^/::notice title=gradle::/' || true
+          grep -E '\.java:[0-9]+: error:' gradle.log | head -6 | while IFS= read -r l; do echo "::error title=compile::$l"; done || true
+          d=hcn/hedera-node/hedera-token-service-impl/build/test-results/test
+          for f in "$d"/*StakingRewardOverflowPropertyTest*.xml; do
+            [ -f "$f" ] || continue
+            echo "::notice title=suite::$(grep -o '<testsuite [^>]*>' "$f" | grep -oE '(tests|skipped|failures|errors)="[^"]*"' | tr '\n' ' ')"
+            grep -o '<testcase name="[^"]*"' "$f" | sed 's/<testcase //' | while IFS= read -r l; do echo "::notice title=case::$l"; done
+            grep -oE 'first overflow at[^<"]*|STAKING OVERFLOW[^<"]*|NEGATIVE REWARD[^<"]*' "$f" | head -8 | while IFS= read -r l; do echo "::notice title=result::$l"; done
+            grep -o '<failure message="[^"]\{0,400\}' "$f" | head -4 | while IFS= read -r l; do echo "::error title=failure::$l"; done
+          done
