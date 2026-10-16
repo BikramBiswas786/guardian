@@ -18,4 +18,8 @@ if "import java.util.HashMap;" not in src:
 end = src.rstrip().rfind("}")
 src = src[:end] + "\n" + additions + "\n}\n"
 target.write_text(src)
+# 3. Hook authorization properties: a standalone file in its own package.
+hooks_pkg = pkg / "hooks"
+hooks_pkg.mkdir(exist_ok=True)
+shutil.copy(here / "HookAuthorizationPropertyTest.java", hooks_pkg / "HookAuthorizationPropertyTest.java")
 print("installed into", hcn)

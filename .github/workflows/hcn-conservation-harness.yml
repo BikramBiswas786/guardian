@@ -58,6 +58,7 @@ jobs:
           ./gradlew :app-service-token-impl:test \
             --tests "*CustomFeeConservationPropertyTest" \
             --tests "*CustomFeeAssessmentStepTest" \
+            --tests "*HookAuthorizationPropertyTest" \
             --console=plain 2>&1 | tee "$GITHUB_WORKSPACE/gradle.log"
 
       # GitHub keeps at most 10 notice annotations per step, so results are split across steps.
@@ -67,7 +68,7 @@ jobs:
           d=hcn/hedera-node/hedera-token-service-impl/build/test-results/test
           grep -E 'BUILD (SUCCESSFUL|FAILED)' gradle.log | tail -1 | sed 's/^/::notice title=gradle::/' || true
           grep -E 'error:' gradle.log | head -5 | while IFS= read -r l; do echo "::error title=compile::$l"; done || true
-          for f in "$d"/*Conservation*.xml "$d"/*CustomFeeAssessmentStepTest*.xml; do
+          for f in "$d"/*Conservation*.xml "$d"/*CustomFeeAssessmentStepTest*.xml "$d"/*HookAuthorization*.xml; do
             [ -f "$f" ] || continue
             echo "::notice title=suite::$(grep -o '<testsuite [^>]*>' "$f" | grep -oE '(name|tests|skipped|failures|errors)="[^"]*"' | head -5 | tr '\n' ' ')"
             grep -o '<failure message="[^"]\{0,600\}' "$f" | head -5 | while IFS= read -r l; do echo "::error title=failure::$l"; done
@@ -81,6 +82,15 @@ jobs:
           for f in "$d"/*Conservation*.xml "$d"/*CustomFeeAssessmentStepTest*.xml; do
             [ -f "$f" ] || continue
             grep -oE '\[[a-z-]+\] (conservation held|CONSERVATION BREAK|VACUOUS|UNEXPECTED)[^<]*' "$f" | head -10 | while IFS= read -r l; do echo "::notice title=result::$l"; done
+          done
+
+      - name: Summarise hook authorization results
+        if: always()
+        run: |
+          d=hcn/hedera-node/hedera-token-service-impl/build/test-results/test
+          for f in "$d"/*HookAuthorization*.xml; do
+            [ -f "$f" ] || continue
+            grep -oE '\[hook-[a-z]+\][^<]*|HOOK (AUTHORIZATION|GATE) VIOLATION[^<"]*' "$f" | head -8 | while IFS= read -r l; do echo "::notice title=hooks::$l"; done
           done
 
       - name: Upload reports
