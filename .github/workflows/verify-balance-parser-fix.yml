@@ -2,6 +2,10 @@ name: Verify balance-parser int-overflow fix
 
 on:
   workflow_dispatch: {}
+  push:
+    branches: [advisory-recheck]
+    paths:
+      - ".github/workflows/verify-balance-parser-fix.yml"
 
 jobs:
   verify-fix:
