@@ -18,9 +18,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - mode: main
-            ref: 640ce5a
-          - mode: jfxq
+          - mode: jfxq-fixed
             ref: e2e-work
     name: ${{ matrix.mode }}
     steps:
@@ -48,6 +46,8 @@ jobs:
           for c in AssociatePrecompileV2SecurityModelTest AtomicBatchAssociatePrecompileV2SecurityModelTest AtomicBatchContractBurnHTSV2SecurityModelTest AtomicBatchContractKeysHtsTest AtomicBatchContractMintHTSV2SecurityModelTest AtomicBatchEthereumCallKeysTest AtomicBatchPrecompileTest AtomicCryptoTransferHTSSuite AtomicEthereumSuite AtomicHelloWorldEthereumSuite ContractBurnHTSV2SecurityModelSuite ContractIdKeyManagedTokenTest ContractKeysHTSSuite ContractKeysStillWorkAsExpectedSuite ContractMintHTSSuite ContractMintHTSV2SecurityModelSuite Create2OperationSuite DeleteTokenPrecompileSuite EthereumSuite HelloWorldEthereumSuite PauseUnpauseTokenAccountPrecompileSuite SigningReqsSuite; do
             T="$T --tests *.$c"
           done
+          ./gradlew :test-clients:spotlessCheck --console=plain > /tmp/spotless.log 2>&1 && echo "SPOTLESS OK" >> /tmp/spotless.log || echo "SPOTLESS FAILED" >> /tmp/spotless.log
+          tail -40 /tmp/spotless.log
           ./gradlew :test-clients:testEmbedded $T --continue --console=plain > /tmp/embedded.log 2>&1 || true
           ./gradlew :test-clients:testRepeatable --tests "*.RepeatableHip423Tests" --continue --console=plain > /tmp/repeatable.log 2>&1 || true
           grep -E "BUILD (SUCCESSFUL|FAILED)" /tmp/embedded.log /tmp/repeatable.log || true
@@ -75,6 +75,7 @@ jobs:
           print("\n".join(rows))
           EOF
           cat /tmp/out/results-${{ matrix.mode }}.txt | head -5
+          tail -40 /tmp/spotless.log > /tmp/out/spotless-${{ matrix.mode }}.log
           grep -E "BUILD (SUCCESSFUL|FAILED)" /tmp/embedded.log /tmp/repeatable.log >> /tmp/out/results-${{ matrix.mode }}.txt || true
           tail -60 /tmp/embedded.log > /tmp/out/embedded-tail-${{ matrix.mode }}.log
           head -1 /tmp/out/results-${{ matrix.mode }}.txt | sed 's/^/::notice title=${{ matrix.mode }}::/'
