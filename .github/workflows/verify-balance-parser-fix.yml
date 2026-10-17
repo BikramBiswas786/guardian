@@ -1,0 +1,48 @@
+name: Verify balance-parser int-overflow fix
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  verify-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fix branch
+        uses: actions/checkout@v4
+        with:
+          repository: BikramBiswas786/hiero-mirror-node
+          ref: fix/balance-parser-account-int-overflow
+          path: hiero-mirror-node
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Run parser tests
+        working-directory: hiero-mirror-node
+        run: |
+          ./gradlew :importer:test --tests "*AccountBalanceLineParserV1Test" --tests "*AccountBalanceLineParserV2Test" --info 2>&1 | tee /tmp/test-output.log || true
+
+      - name: Summarize
+        working-directory: hiero-mirror-node
+        run: |
+          if grep -q "BUILD SUCCESSFUL" /tmp/test-output.log; then
+            echo "::notice title=verify-fix::BUILD SUCCESSFUL"
+          else
+            echo "::error title=verify-fix::BUILD FAILED"
+          fi
+          grep -E "Tests? |PASSED|FAILED|tests completed" /tmp/test-output.log | tail -50 | while IFS= read -r line; do
+            echo "::notice title=test-line::$line"
+          done
+          find hiero-mirror-node -path "*/test-results/*AccountBalanceLineParserV*Test.xml" -exec cat {} \; > /tmp/junit.xml 2>/dev/null || true
+          if [ -s /tmp/junit.xml ]; then
+            grep -oE '<testcase name="[^"]*"[^/]*/?>' /tmp/junit.xml | while IFS= read -r line; do
+              if echo "$line" | grep -q "<failure"; then
+                echo "::error title=testcase::$line"
+              else
+                echo "::notice title=testcase::$line"
+              fi
+            done
+          fi
