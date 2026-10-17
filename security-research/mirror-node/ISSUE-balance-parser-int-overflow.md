@@ -1,4 +1,4 @@
-# Balance line parsers truncate realm/account numbers to `int`, dropping balance records above 2^31
+# Balance line parsers truncate account numbers to `int`, dropping balance records above 2^31
 
 **Repo:** hiero-mirror-node · **Component:** importer / balance file reader
 **Type:** correctness / robustness (future-proofing) — *not* a security vulnerability
@@ -21,13 +21,21 @@ long balance    = Long.parseLong(parts.get(3));
 EntityId.of(shardNum, realmNum, accountNum);         // EntityId.of(long, long, long)
 ```
 
-Account and realm numbers are `int64` in the Hedera protocol, and
-`EntityId.of` already takes `long`. Any account or realm number greater than
-`Integer.MAX_VALUE` (2,147,483,647) makes `Integer.parseInt` throw
-`NumberFormatException`, which is caught and rethrown as
+Account numbers are `int64` in the Hedera protocol (`EntityId`'s own `num`
+field is 38 bits), and `EntityId.of` already takes `long`. Any account number
+greater than `Integer.MAX_VALUE` (2,147,483,647) makes `Integer.parseInt`
+throw `NumberFormatException`, which is caught and rethrown as
 `InvalidDatasetException`. The effect is that the balance line for such an
 account cannot be parsed — the balance snapshot drops/errors on that account
 rather than recording its balance.
+
+**Realm is not actually affected despite being parsed the same way**: `EntityId`
+independently bounds realm to 16 bits (`REALM_MASK = 65,535`), so a realm
+value anywhere near `2^31` is already rejected by `EntityId.of` regardless of
+whether it was parsed as `int` or `long`. I verified this directly — a test
+asserting a realm of `2^31` parses successfully correctly *fails* (`EntityId`
+throws), while the equivalent test for the account field passes cleanly. The
+reachable defect is the account field only.
 
 Account balances are authoritative ledger state, so silently failing to
 import them once account numbers cross 2^31 is a correctness problem.
@@ -48,15 +56,16 @@ grow over the network's lifetime, and it is cheap to fix now.
 
 ## Suggested fix
 
-Parse realm and account as `long`, keeping the existing non-negative guard,
-to match `EntityId`'s `long` domain:
+Parse account as `long`, keeping the existing non-negative guard, to match
+`EntityId`'s `long` domain:
 
 ```java
-long realmNum   = Long.parseLong(parts.get(1));
 long accountNum = Long.parseLong(parts.get(2));
 ```
 
-(apply to both V1 and V2). The existing
+(apply to both V1 and V2; realm can be widened to `long` too for symmetry
+with `EntityId.of`'s signature, though it doesn't change observable behavior
+on its own since `EntityId` bounds it separately). The existing
 `shardNum < 0 || realmNum < 0 || accountNum < 0 || balance < 0` check and the
 `shardNum != 0` check continue to work unchanged.
 
@@ -82,3 +91,9 @@ Actions confirms the defect by execution, not inspection:
 
 Suite: 2 tests, 0 failures. The test source is
 `BalanceParserIntTruncationTest.java` (in this directory).
+
+The fix itself was separately verified in CI against real `main`: a new
+regression row asserting an account value of `2^31` parses correctly passes
+in both V1 and V2 with no regressions in either parser's full existing test
+suite, while the equivalent assertion for realm at `2^31` correctly fails
+(`EntityId` rejects it) — confirming the fix's correct, narrower scope.
