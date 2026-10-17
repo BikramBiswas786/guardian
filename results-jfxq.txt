@@ -1,0 +1,186 @@
+total=399 failed=61 skipped=1
+AssociatePrecompileV2SecurityModelTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@4ea681e1 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchAssociatePrecompileV2SecurityModelTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@7ca9e47d size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchAssociatePrecompileV2SecurityModelTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@3b2d3cf6 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchAssociatePrecompileV2SecurityModelTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@4763e09a size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchAssociatePrecompileV2SecurityModelTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@744792ee size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchAssociatePrecompileV2SecurityModelTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@7aca2c08 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchContractMintHTSV2SecurityModelTest.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicBatchContractMintHTSV2SecurityModelTest.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicBatchContractMintHTSV2SecurityModelTest.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicBatchContractMintHTSV2SecurityModelTest.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicBatchContractMintHTSV2SecurityModelTest.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicBatchContractMintHTSV2SecurityModelTest.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicBatchContractBurnHTSV2SecurityModelTest.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicBatchContractBurnHTSV2SecurityModelTest.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicBatchContractBurnHTSV2SecurityModelTest.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicBatchContractBurnHTSV2SecurityModelTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@314837da size=64 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchContractBurnHTSV2SecurityModelTest.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicBatchContractBurnHTSV2SecurityModelTest.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicBatchContractBurnHTSV2SecurityModelTest.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+EthereumSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+HelloWorldEthereumSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicEthereumSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicHelloWorldEthereumSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+Create2OperationSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@23ee8ab4 size=128 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\00
+    at: 
+ContractBurnHTSV2SecurityModelSuite.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+ContractBurnHTSV2SecurityModelSuite.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+ContractBurnHTSV2SecurityModelSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@5704b25b size=64 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+ContractIdKeyManagedTokenTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+ContractKeysHTSSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@47e0aacd size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+ContractKeysHTSSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@1b518e6c size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+ContractKeysHTSSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@149f4ef1 size=64 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+ContractKeysHTSSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@55da8c20 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+ContractKeysHTSSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@7274dd12 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+ContractKeysHTSSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@6b6f3968 size=128 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\00
+    at: 
+ContractKeysHTSSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@44fa9d4c size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+ContractKeysHTSSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@50ee50fa size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+ContractKeysHTSSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@5fc5d9dd size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+ContractKeysHTSSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@353ccbc0 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+ContractKeysStillWorkAsExpectedSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+ContractKeysStillWorkAsExpectedSuite.as written
+    msg: org.opentest4j.AssertionFailedError: com.hedera.services.bdd.spec.utilops.streams.assertions.TransactionBodyAssertion@516ab6e4 ended with result: Timed out in PT15S
+    at: 
+ContractMintHTSSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@488b83a9 size=128 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\001F\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000...">> but was: <<ByteString@
+    at: 
+ContractMintHTSV2SecurityModelSuite.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+ContractMintHTSV2SecurityModelSuite.as written
+    msg: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+DeleteTokenPrecompileSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@742c4418 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+PauseUnpauseTokenAccountPrecompileSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@1245af89 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+PauseUnpauseTokenAccountPrecompileSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@5821b1c9 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+PauseUnpauseTokenAccountPrecompileSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@1af6894e size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+PauseUnpauseTokenAccountPrecompileSuite.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@1d13b09e size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchContractKeysHtsTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@3d753270 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchContractKeysHtsTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@51f6fd3f size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchContractKeysHtsTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@41169b47 size=64 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchContractKeysHtsTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@5ea35ce9 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchContractKeysHtsTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@6507857a size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchContractKeysHtsTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@68eba041 size=128 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\00
+    at: 
+AtomicBatchContractKeysHtsTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@6a623fec size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchContractKeysHtsTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@4cfbb2df size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchContractKeysHtsTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@21b78582 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchContractKeysHtsTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@6bf888ca size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+AtomicBatchEthereumCallKeysTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: 
+AtomicBatchPrecompileTest.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>, Bad contractCallResult! :: Wrong contract call result! ==> expected: <<ByteString@1661d620 size=32 contents="\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000
+    at: 
+RepeatableHip423Tests.as written
+    msg: java.lang.IllegalStateException: java.lang.Exception: Bad child records! :: Bad receipt! :: Bad status! ==> expected: <INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE> but was: <INVALID_SIGNATURE>
+    at: RepeatableHip423Tests.java:1374
+/tmp/embedded.log:BUILD FAILED in 8m 29s
+/tmp/repeatable.log:BUILD FAILED in 1m 20s
