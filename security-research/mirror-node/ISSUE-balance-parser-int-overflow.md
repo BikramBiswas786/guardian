@@ -97,3 +97,11 @@ regression row asserting an account value of `2^31` parses correctly passes
 in both V1 and V2 with no regressions in either parser's full existing test
 suite, while the equivalent assertion for realm at `2^31` correctly fails
 (`EntityId` rejects it) — confirming the fix's correct, narrower scope.
+
+## Related: one out-of-range entity ID aborts the whole balance file
+
+`EntityId.of` rejects out-of-range IDs with `InvalidEntityException`, which is a sibling of `InvalidDatasetException`, not a subtype. `CsvBalanceFileReader` skips bad lines by catching only `InvalidDatasetException`, so a line with an out-of-range realm, account or token ID escapes that catch and aborts the entire file instead of being skipped.
+
+Reproduced on current `main`: a valid balance file with one appended line `0,65536,3,340` fails to read with `InvalidEntityException: Invalid entity ID: 0.65536.3`. The existing tests `readValidWhenFileHasBadTrailingLines` and `readValidWhenFileHasLinesWithDifferentShardNum` show the intended behaviour is to skip the line.
+
+Suggested fix: catch `InvalidEntityException` alongside `NumberFormatException` in both line parsers and rethrow as `InvalidDatasetException`. This also matters for the `long` parsing fix above: without it, account values at or above 2^38 would abort the file instead of skipping one line.
