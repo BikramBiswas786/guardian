@@ -8,45 +8,66 @@ on:
       - ".github/workflows/verify-balance-parser-fix.yml"
 
 jobs:
-  verify-fix:
+  verify:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mode: main-unpatched
+            code_ref: 8c354af83d73a848867ee23ba84cab3902b6daff
+          - mode: previous-fix
+            code_ref: e0a29f1
+          - mode: corrected-fix
+            code_ref: d6823fe
+    name: ${{ matrix.mode }}
     steps:
-      - name: Checkout fix branch
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           repository: BikramBiswas786/hiero-mirror-node
           ref: fix/balance-parser-account-int-overflow
-          path: hiero-mirror-node
+          fetch-depth: 0
+          path: hmn
 
-      - name: Set up JDK 25
-        uses: actions/setup-java@v4
+      - name: Check out code state, overlay test files from the test commit
+        working-directory: hmn
+        run: |
+          git checkout -q ${{ matrix.code_ref }}
+          git checkout -q dcedb8d -- \
+            importer/src/test/java/org/hiero/mirror/importer/reader/balance/CsvBalanceFileReaderTest.java \
+            importer/src/test/java/org/hiero/mirror/importer/reader/balance/line/AccountBalanceLineParserV1Test.java \
+            importer/src/test/java/org/hiero/mirror/importer/reader/balance/line/AccountBalanceLineParserV2Test.java
+          git log --oneline -1
+
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "25"
 
-      - name: Run parser tests
-        working-directory: hiero-mirror-node
+      - name: Run tests
+        working-directory: hmn
         run: |
-          ./gradlew :importer:test --tests "*AccountBalanceLineParserV1Test" --tests "*AccountBalanceLineParserV2Test" --info 2>&1 | tee /tmp/test-output.log || true
+          ./gradlew :importer:test --continue \
+            --tests "*AccountBalanceLineParserV1Test" \
+            --tests "*AccountBalanceLineParserV2Test" \
+            --tests "*BalanceFileReaderImplV1Test" \
+            --tests "*BalanceFileReaderImplV2Test" > /tmp/out.log 2>&1 || true
+          tail -5 /tmp/out.log
 
       - name: Summarize
-        working-directory: hiero-mirror-node
+        working-directory: hmn
         run: |
-          if grep -q "BUILD SUCCESSFUL" /tmp/test-output.log; then
-            echo "::notice title=verify-fix::BUILD SUCCESSFUL"
-          else
-            echo "::error title=verify-fix::BUILD FAILED"
-          fi
-          grep -E "Tests? |PASSED|FAILED|tests completed" /tmp/test-output.log | tail -50 | while IFS= read -r line; do
-            echo "::notice title=test-line::$line"
-          done
-          find hiero-mirror-node -path "*/test-results/*AccountBalanceLineParserV*Test.xml" -exec cat {} \; > /tmp/junit.xml 2>/dev/null || true
-          if [ -s /tmp/junit.xml ]; then
-            grep -oE '<testcase name="[^"]*"[^/]*/?>' /tmp/junit.xml | while IFS= read -r line; do
-              if echo "$line" | grep -q "<failure"; then
-                echo "::error title=testcase::$line"
-              else
-                echo "::notice title=testcase::$line"
-              fi
-            done
-          fi
+          python3 - <<'EOF'
+          import glob, xml.etree.ElementTree as ET
+          mode = "${{ matrix.mode }}"
+          total = fail = 0
+          for f in glob.glob("importer/build/test-results/test/*.xml"):
+              for tc in ET.parse(f).getroot().iter("testcase"):
+                  total += 1
+                  for bad in list(tc.findall("failure")) + list(tc.findall("error")):
+                      fail += 1
+                      msg = (bad.get("message") or "").splitlines()[0][:220] if bad.get("message") else bad.get("type", "")
+                      cls = tc.get("classname").split(".")[-1]
+                      print(f"::error title={mode}::{cls} | {tc.get('name')[:120]} | {msg}")
+          print(f"::notice title={mode}::total={total} failed={fail}")
+          EOF
