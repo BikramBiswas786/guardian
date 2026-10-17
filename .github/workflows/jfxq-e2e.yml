@@ -49,7 +49,8 @@ jobs:
           ./gradlew :test-clients:spotlessApply --console=plain > /tmp/spotless.log 2>&1 && echo "SPOTLESS APPLY OK" >> /tmp/spotless.log || echo "SPOTLESS APPLY FAILED" >> /tmp/spotless.log
           git diff > /tmp/spotless.patch; echo "patch lines: $(wc -l < /tmp/spotless.patch)" >> /tmp/spotless.log
           tail -40 /tmp/spotless.log
-          ./gradlew :test-clients:testEmbedded $T --continue --console=plain > /tmp/embedded.log 2>&1 || true
+          ./gradlew :test-clients:spotlessCheck --console=plain > /tmp/spotcheck.log 2>&1 && echo "SPOTLESS CHECK OK" >> /tmp/spotless.log || echo "SPOTLESS CHECK FAILED" >> /tmp/spotless.log
+          ./gradlew :test-clients:testEmbedded $T --max-workers=2 --continue --console=plain > /tmp/embedded.log 2>&1 || true
           ./gradlew :test-clients:testRepeatable --tests "*.RepeatableHip423Tests" --continue --console=plain > /tmp/repeatable.log 2>&1 || true
           grep -E "BUILD (SUCCESSFUL|FAILED)" /tmp/embedded.log /tmp/repeatable.log || true
 
