@@ -1,0 +1,6 @@
+total=399 failed=1 skipped=1
+ContractKeysStillWorkAsExpectedSuite.as written
+    msg: org.opentest4j.AssertionFailedError: com.hedera.services.bdd.spec.utilops.streams.assertions.TransactionBodyAssertion@54afbf55 ended with result: Timed out in PT15S
+    at: 
+/tmp/embedded.log:BUILD FAILED in 8m 37s
+/tmp/repeatable.log:BUILD SUCCESSFUL in 1m 19s
