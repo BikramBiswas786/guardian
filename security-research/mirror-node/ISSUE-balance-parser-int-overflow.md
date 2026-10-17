@@ -66,3 +66,19 @@ Add a parser test with an account number of `2_147_483_648` (2^31) and assert
 the parsed `EntityId` has `num() == 2147483648L` rather than the line being
 rejected. A property/fuzz variant over random `long` account numbers in
 `[0, Long.MAX_VALUE]` guards against any further narrowing.
+
+## Evidence (reproduced by test against current main)
+
+A JUnit test run against `hiero-mirror-node` @ `8c354af` (Java 25) on GitHub
+Actions confirms the defect by execution, not inspection:
+
+- `v2_accountNumberAtIntMaxParses_butAboveIntMaxIsDropped` — PASS:
+  `AccountBalanceLineParserV2.parse("0,0,2147483647,100")` succeeds
+  (`EntityId.num == 2147483647`), while `parse("0,0,2147483648,100")` throws
+  `InvalidDatasetException` — i.e. the balance line for account 2^31 is
+  dropped.
+- `v1_accountNumberAboveIntMaxIsDropped` — PASS: same behavior in
+  `AccountBalanceLineParserV1`.
+
+Suite: 2 tests, 0 failures. The test source is
+`BalanceParserIntTruncationTest.java` (in this directory).
