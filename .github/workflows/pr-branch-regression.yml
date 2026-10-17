@@ -1,0 +1,58 @@
+name: PR branch full-module regression
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [advisory-recheck]
+    paths:
+      - ".github/workflows/pr-branch-regression.yml"
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        branch:
+          - fix/q776-update-token-keys-gap
+          - fix/jfxq-response-code-consistency
+    name: ${{ matrix.branch }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: BikramBiswas786/hiero-consensus-node
+          ref: ${{ matrix.branch }}
+          path: hcn
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+
+      - name: Run full smart-contract-service-impl tests
+        working-directory: hcn
+        run: |
+          git log --oneline -1
+          ./gradlew :app-service-contract-impl:test --continue --console=plain > /tmp/out.log 2>&1 || true
+          grep -E "BUILD (SUCCESSFUL|FAILED)" /tmp/out.log | tail -1
+
+      - name: Summarize
+        working-directory: hcn
+        run: |
+          python3 - <<'EOF'
+          import glob, xml.etree.ElementTree as ET
+          b = "${{ matrix.branch }}".split("/")[-1]
+          total = fail = shown = 0
+          for f in glob.glob("hedera-node/hedera-smart-contract-service-impl/build/test-results/test/*.xml"):
+              for tc in ET.parse(f).getroot().iter("testcase"):
+                  total += 1
+                  for bad in list(tc.findall("failure")) + list(tc.findall("error")):
+                      fail += 1
+                      if shown < 9:
+                          shown += 1
+                          m = (bad.get("message") or bad.get("type") or "").splitlines()
+                          print(f"::error title={b}::{tc.get('classname').split('.')[-1]}.{tc.get('name')[:100]} | {(m[0] if m else '')[:220]}")
+          print(f"::notice title={b}::total={total} failed={fail}")
+          EOF
+          grep -E "BUILD (SUCCESSFUL|FAILED)" /tmp/out.log | tail -1 | sed 's/^/::notice title=gradle::/'
