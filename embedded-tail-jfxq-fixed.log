@@ -1,0 +1,60 @@
+  2026-10-18 19:52:15.987 <CONCURRENT-n0> INFO  1058 HapiSpec - 'Create2OperationSuite.cannotSelfDestructToMirrorAddress' - final status: PASSED!
+  2026-10-18 19:52:15.987 <CONCURRENT-n0> INFO  1058 HapiSpec - 'Create2OperationSuite.canMergeCreate2ChildWithHollowAccountUnlimitedAssociations' - final status: PASSED!
+  2026-10-18 19:52:15.997 <CONCURRENT-n0> INFO  1058 HapiSpec - 'Create2OperationSuite.payableCreate2WorksAsExpected' - final status: PASSED!
+
+
+    Oct 18, 2026 7:52:47 PM org.junit.platform.launcher.core.DiscoveryIssueNotifier logIssues
+    INFO: TestEngine with ID 'junit-jupiter' encountered a non-critical issue during test discovery:
+    
+    (1) [INFO] Parallel test execution is enabled but the default ForkJoinPool-based executor service will be used. Please give the new implementation based on a regular thread pool a try by setting the 'junit.jupiter.execution.parallel.config.executor-service' configuration parameter to 'WORKER_THREAD_POOL' and report any issues to the JUnit team. Alternatively, set the configuration parameter to 'FORK_JOIN_POOL' to hide this message and keep using the original implementation.
+    2026-10-18 19:52:47.598 <CONCURRENT-n0> INFO  742  Hedera - HederaNode#0 is FREEZE_COMPLETE
+    2026-10-18 19:52:47.598 <CONCURRENT-n0> INFO  762  Hedera - Platform status is now FREEZE_COMPLETE
+    2026-10-18 19:52:47.599 <CONCURRENT-n0> INFO  372  ClprChannelManager - CLPR sync orchestrator stopped
+    2026-10-18 19:52:47.609 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #0 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000000.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000000.pnd.json)
+    2026-10-18 19:52:47.610 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #1 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000001.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000001.pnd.json)
+    2026-10-18 19:52:47.613 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #2 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000002.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000002.pnd.json)
+    2026-10-18 19:52:47.620 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #3 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000003.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000003.pnd.json)
+    2026-10-18 19:52:47.620 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #4 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000004.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000004.pnd.json)
+    2026-10-18 19:52:47.631 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #5 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000005.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000005.pnd.json)
+    2026-10-18 19:52:47.640 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #6 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000006.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000006.pnd.json)
+    2026-10-18 19:52:47.644 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #7 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000007.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000007.pnd.json)
+    2026-10-18 19:52:47.649 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #8 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000008.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000008.pnd.json)
+    2026-10-18 19:52:47.651 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #9 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000009.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000009.pnd.json)
+    2026-10-18 19:52:47.659 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #10 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000010.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000010.pnd.json)
+    2026-10-18 19:52:47.667 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #11 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000011.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000011.pnd.json)
+    2026-10-18 19:52:47.683 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #12 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000012.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000012.pnd.json)
+    2026-10-18 19:52:47.699 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #13 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000013.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000013.pnd.json)
+    2026-10-18 19:52:47.701 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #14 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000014.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000014.pnd.json)
+    2026-10-18 19:52:47.710 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #15 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000015.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000015.pnd.json)
+    2026-10-18 19:52:47.717 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #16 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000016.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000016.pnd.json)
+    2026-10-18 19:52:47.726 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #17 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000017.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000017.pnd.json)
+    2026-10-18 19:52:47.731 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #18 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000018.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000018.pnd.json)
+    2026-10-18 19:52:47.734 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #19 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000019.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000019.pnd.json)
+    2026-10-18 19:52:47.739 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #20 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000020.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000020.pnd.json)
+    2026-10-18 19:52:47.744 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #21 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000021.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000021.pnd.json)
+    2026-10-18 19:52:47.756 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #22 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000022.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000022.pnd.json)
+    2026-10-18 19:52:47.768 <CONCURRENT-n0> INFO  148  GrpcBlockItemWriter - Flushed pending block #23 (build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000023.pnd.gz, build/concurrent-test/testEmbedded/node0/data/blockStreams/block-0.0.3/000000000000000000000000000000000023.pnd.json)
+
+
+FAILURE: Executed 350 tests in 2m 10s (1 failed)
+
+
+350 tests completed, 1 failed
+
+> Task :test-clients:testEmbedded FAILED
+
+[Incubating] Problems report is available at: file:///home/runner/work/guardian/guardian/hcn/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test-clients:testEmbedded'.
+> There were failing tests. See the report at: file:///home/runner/work/guardian/guardian/hcn/hedera-node/test-clients/build/reports/tests/testEmbedded/index.html
+
+BUILD FAILED in 5m 20s
+367 actionable tasks: 247 executed, 107 from cache, 13 up-to-date
+
+Publishing Build Scan to Develocity...
+https://gradle.com/s/cee3kdrstmcju
+
+Configuration cache entry stored.

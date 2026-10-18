@@ -1,0 +1,40 @@
+Starting a Gradle Daemon (subsequent builds will be faster)
+Isolated Projects is an incubating feature.
+Calculating task graph as no cached configuration is available for tasks: :test-clients:spotlessApply
+> Task :besu-native-patch:compileJava
+> Task :besu-native-patch:pluginDescriptors
+> Task :besu-native-patch:processResources
+> Task :besu-native-patch:classes
+> Task :besu-native-patch:jar
+> Task :benchmark-tracking:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :benchmark-tracking:generateExternalPluginSpecBuilders FROM-CACHE
+> Task :benchmark-tracking:extractPrecompiledScriptPluginPlugins FROM-CACHE
+> Task :benchmark-tracking:compilePluginsBlocks FROM-CACHE
+> Task :benchmark-tracking:generatePrecompiledScriptPluginAccessors FROM-CACHE
+> Task :benchmark-tracking:generateScriptPluginAdapters FROM-CACHE
+> Task :benchmark-tracking:compileKotlin FROM-CACHE
+> Task :benchmark-tracking:compileJava NO-SOURCE
+> Task :benchmark-tracking:pluginDescriptors
+> Task :benchmark-tracking:processResources
+> Task :benchmark-tracking:classes
+> Task :benchmark-tracking:jar
+> Task :test-clients:spotlessKotlinGradle FROM-CACHE
+> Task :test-clients:spotlessKotlinGradleApply UP-TO-DATE
+> Task :test-clients:spotlessJava
+> Task :test-clients:spotlessJavaApply
+> Task :test-clients:spotlessJavaInfoFiles FROM-CACHE
+> Task :test-clients:spotlessJavaInfoFilesApply UP-TO-DATE
+> Task :test-clients:spotlessApply
+
+[Incubating] Problems report is available at: file:///home/runner/work/guardian/guardian/hcn/build/reports/problems/problems-report.html
+
+BUILD SUCCESSFUL in 1m 40s
+19 actionable tasks: 9 executed, 8 from cache, 2 up-to-date
+
+Publishing Build Scan to Develocity...
+https://gradle.com/s/pbtutpnahvo44
+
+Configuration cache entry stored.
+SPOTLESS APPLY OK
+patch lines: 0
+SPOTLESS CHECK OK

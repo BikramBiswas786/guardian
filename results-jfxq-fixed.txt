@@ -1,0 +1,6 @@
+total=399 failed=1 skipped=1
+Create2OperationSuite.as written
+    msg: java.lang.IllegalStateException: com.hedera.services.bdd.spec.exceptions.HapiTxnPrecheckStateException: Wrong precheck status for FileCreate in 'Create2OperationSuite.canDeleteViaAlias'! Expected OK, actual DUPLICATE_TRANSACTION
+    at: 
+/tmp/embedded.log:BUILD FAILED in 5m 20s
+/tmp/repeatable.log:BUILD SUCCESSFUL in 1m 2s
