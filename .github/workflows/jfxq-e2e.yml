@@ -19,7 +19,7 @@ jobs:
       matrix:
         include:
           - mode: jfxq-fixed
-            ref: e2e-work
+            ref: fix/jfxq-response-code-consistency
     name: ${{ matrix.mode }}
     steps:
       - uses: actions/checkout@v4
